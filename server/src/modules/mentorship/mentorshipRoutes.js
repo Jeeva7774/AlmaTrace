@@ -247,7 +247,30 @@ router.patch('/requests/:id', async (req, res, next) => {
 
 // ── 2. Mentorship Relationships ─────────────────────────────────────────────
 
-// GET /api/v1/mentorships/:id — view relationship
+// GET /api/v1/mentorship/relationships — list all user relationships
+router.get('/relationships', async (req, res, next) => {
+  try {
+    const listRes = await query(
+      `SELECT m.*,
+              p_mentee.display_name AS mentee_name, p_mentee.headline AS mentee_headline,
+              p_mentor.display_name AS mentor_name, p_mentor.headline AS mentor_headline,
+              req.purpose, req.preferred_mode
+       FROM mentorships m
+       JOIN profiles p_mentee ON p_mentee.user_id = m.mentee_id
+       JOIN profiles p_mentor ON p_mentor.user_id = m.mentor_id
+       JOIN mentorship_requests req ON req.id = m.request_id
+       WHERE m.mentee_id = $1 OR m.mentor_id = $1
+       ORDER BY m.started_at DESC`,
+      [req.user.id]
+    );
+
+    res.json({ relationships: listRes.rows });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/v1/mentorship/relationships/:id — view relationship
 router.get('/relationships/:id', async (req, res, next) => {
   try {
     const shipRes = await query(
@@ -411,6 +434,31 @@ router.patch('/meetings/:id', async (req, res, next) => {
     );
 
     res.json({ message: `Meeting ${action}ed.`, meeting: result.rows[0] });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/v1/mentorship/meetings — list meetings for user
+router.get('/meetings', async (req, res, next) => {
+  try {
+    const meetingsRes = await query(
+      `SELECT mt.*,
+              s.mentee_id, s.mentor_id,
+              p_mentee.display_name AS mentee_name,
+              p_mentor.display_name AS mentor_name,
+              req.purpose
+       FROM meetings mt
+       JOIN mentorships s ON s.id = mt.mentorship_id
+       JOIN profiles p_mentee ON p_mentee.user_id = s.mentee_id
+       JOIN profiles p_mentor ON p_mentor.user_id = s.mentor_id
+       JOIN mentorship_requests req ON req.id = s.request_id
+       WHERE s.mentee_id = $1 OR s.mentor_id = $1
+       ORDER BY mt.scheduled_at ASC`,
+      [req.user.id]
+    );
+
+    res.json({ meetings: meetingsRes.rows });
   } catch (err) {
     next(err);
   }

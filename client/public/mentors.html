@@ -16,6 +16,7 @@
         <a href="/dashboard.html" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: var(--space-2);">
           <span class="site-header__logo" aria-hidden="true">◈</span>
           <span class="site-header__name">ALMATRACE</span>
+          <span class="site-header__dept">PSG MCA</span>
         </a>
       </div>
       <nav class="site-header__nav" aria-label="Main navigation" style="display: flex; gap: var(--space-3); align-items: center;">
@@ -29,25 +30,72 @@
   </header>
 
   <main id="main-content" class="container" style="padding-block: var(--space-8);">
+    
+    <!-- Page Header -->
     <div style="margin-bottom: var(--space-6);">
       <h1 style="font-size: var(--text-3xl); font-weight: 800; margin-bottom: var(--space-2);">Department Mentors</h1>
-      <p style="color: var(--color-text-muted); font-size: var(--text-sm);">
-        Verified MCA alumni available for structured guidance. Recommendations are rule-based, explainable, and respect mentor capacity limits.
+      <p style="color: var(--color-text-muted); font-size: var(--text-sm); max-width: 48rem;">
+        Verified MCA alumni available for structured guidance. Recommendations are rule-based, explainable, and respect capacity constraints.
       </p>
     </div>
 
-    <div id="loading" style="text-align: center; padding: var(--space-8); color: var(--color-text-muted);">
-      Loading recommended mentors...
+    <!-- Search & Filter Controls -->
+    <div class="feature-card" style="margin-bottom: var(--space-6); padding: var(--space-4);">
+      <div style="display: flex; flex-direction: column; gap: var(--space-3);">
+        
+        <!-- Search Input -->
+        <div style="display: flex; gap: var(--space-2); flex-wrap: wrap;">
+          <input
+            type="text"
+            id="search-input"
+            placeholder="Search by mentor name, company, or expertise (e.g. Cloud, Systems, AI)..."
+            aria-label="Search mentors"
+            style="flex: 1; min-width: 260px; padding: var(--space-2) var(--space-3); font-size: var(--text-sm);"
+          />
+          <button id="clear-filters-btn" class="btn btn--ghost" style="font-size: var(--text-xs); border: 1px solid var(--color-border); display: none;">
+            ✕ Reset Filters
+          </button>
+        </div>
+
+        <!-- Filter Pills Bar -->
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-2);">
+          <div style="display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap;" role="group" aria-label="Topic filter">
+            <span style="font-size: var(--text-xs); font-weight: 700; color: var(--color-text-muted);">Topic:</span>
+            <button class="filter-btn active" data-topic="all">All Topics</button>
+            <button class="filter-btn" data-topic="Cloud">Cloud & Systems</button>
+            <button class="filter-btn" data-topic="Software">Software Eng</button>
+            <button class="filter-btn" data-topic="Machine Learning">AI / ML</button>
+            <button class="filter-btn" data-topic="Career">Career & Transition</button>
+          </div>
+
+          <div id="results-count" style="font-size: var(--text-xs); font-weight: 700; color: var(--color-text-muted);">
+            Loading mentors...
+          </div>
+        </div>
+
+      </div>
     </div>
 
+    <!-- Mentors Grid -->
     <div id="mentors-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: var(--space-6);">
-      <!-- Mentors rendered here -->
+      <!-- Mentors rendered dynamically -->
     </div>
 
-    <!-- Request Modal -->
+    <!-- Empty State -->
+    <div id="empty-state" style="display: none; text-align: center; padding: var(--space-12); background: var(--color-surface); border-radius: var(--radius-lg); border: 1.5px dashed var(--color-border);">
+      <h3 style="font-size: var(--text-lg); font-weight: 700; margin-bottom: var(--space-2);">No matching mentors found</h3>
+      <p style="color: var(--color-text-muted); font-size: var(--text-sm); margin-bottom: var(--space-4);">
+        Try adjusting your keywords or selecting "All Topics" to see available alumni mentors.
+      </p>
+      <button id="empty-reset-btn" class="btn btn--primary" style="font-size: var(--text-sm);">
+        Reset All Filters
+      </button>
+    </div>
+
+    <!-- Mentorship Request Modal -->
     <div id="request-modal" style="display: none; position: fixed; inset: 0; background: rgba(13, 59, 43, 0.65); backdrop-filter: blur(2px); z-index: 1000; align-items: center; justify-content: center; padding: var(--space-4);" role="dialog" aria-modal="true" aria-labelledby="modal-title">
       <div style="background: var(--color-surface); width: 100%; max-width: 32rem; border-radius: var(--radius-lg); padding: var(--space-6); box-shadow: var(--shadow-md); border: 2px solid var(--color-border);">
-        <h2 id="modal-title" style="font-size: var(--text-xl); font-weight: 700; margin-bottom: var(--space-2);">Send Mentorship Request</h2>
+        <h2 id="modal-title" style="font-size: var(--text-xl); font-weight: 700; margin-bottom: var(--space-1);">Send Mentorship Request</h2>
         <p id="modal-subtitle" style="font-size: var(--text-sm); color: var(--color-text-muted); margin-bottom: var(--space-4);"></p>
 
         <form id="request-form">
@@ -55,14 +103,14 @@
 
           <div style="margin-bottom: var(--space-4);">
             <label for="purpose" style="display: block; font-weight: 600; font-size: var(--text-sm); margin-bottom: var(--space-1);">
-              Objective / Guidance Topic <span aria-hidden="true" style="color: var(--color-error);">*</span>
+              Objective / Topic of Guidance <span aria-hidden="true" style="color: var(--color-error);">*</span>
             </label>
             <input
               type="text"
               id="purpose"
               required
-              placeholder="e.g. Guidance on Systems Programming and Cloud Architectures"
-              style="width: 100%; padding: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius); font-size: var(--text-base);"
+              placeholder="e.g. Distributed Systems Architecture & Career Guidance"
+              style="width: 100%; padding: var(--space-3); border: 1.5px solid var(--color-border); border-radius: var(--radius); font-size: var(--text-sm);"
             />
           </div>
 
@@ -72,11 +120,11 @@
             </label>
             <select
               id="preferred-mode"
-              style="width: 100%; padding: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius); font-size: var(--text-base); background: var(--color-surface);"
+              style="width: 100%; padding: var(--space-3); border: 1.5px solid var(--color-border); border-radius: var(--radius); font-size: var(--text-sm); background: #FFFFFF;"
             >
-              <option value="online">Online Video / Voice Call</option>
-              <option value="in_person">In-Person (Campus)</option>
-              <option value="either">Either</option>
+              <option value="online">Online Video / Voice (Google Meet)</option>
+              <option value="in_person">In-Person (PSG Tech Campus)</option>
+              <option value="either">Either Mode</option>
             </select>
           </div>
 
@@ -87,8 +135,8 @@
             <textarea
               id="message"
               rows="3"
-              placeholder="Briefly describe what questions you'd like to explore and your availability..."
-              style="width: 100%; padding: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius); font-size: var(--text-base); font-family: inherit;"
+              placeholder="Introduce yourself, your semester, and what specific questions you have..."
+              style="width: 100%; padding: var(--space-3); border: 1.5px solid var(--color-border); border-radius: var(--radius); font-size: var(--text-sm); font-family: inherit;"
             ></textarea>
           </div>
 
@@ -99,11 +147,17 @@
         </form>
       </div>
     </div>
+
   </main>
 
   <footer class="site-footer" role="contentinfo">
     <div class="container">
       <p>ALMATRACE — Department of MCA, PSG College of Technology.</p>
+      <nav class="site-footer__links" aria-label="Footer links">
+        <a href="/privacy.html">Privacy Notice</a>
+        <a href="/conduct.html">Code of Conduct</a>
+        <a href="/accessibility.html">Accessibility</a>
+      </nav>
     </div>
   </footer>
 
@@ -112,13 +166,21 @@
 
     const api = new ApiClient('/api/v1');
     const mentorsGrid = document.getElementById('mentors-grid');
-    const loading = document.getElementById('loading');
+    const emptyState = document.getElementById('empty-state');
+    const resultsCount = document.getElementById('results-count');
+    const searchInput = document.getElementById('search-input');
+    const clearFiltersBtn = document.getElementById('clear-filters-btn');
+    const emptyResetBtn = document.getElementById('empty-reset-btn');
+    const filterBtns = document.querySelectorAll('.filter-btn');
+
     const modal = document.getElementById('request-modal');
-    const modalTitle = document.getElementById('modal-title');
     const modalSubtitle = document.getElementById('modal-subtitle');
     const mentorIdInput = document.getElementById('mentor-id');
     const modalCancelBtn = document.getElementById('modal-cancel-btn');
     const requestForm = document.getElementById('request-form');
+
+    let allRecommendations = [];
+    let activeTopic = 'all';
 
     document.getElementById('logout-btn').addEventListener('click', async () => {
       try { await api.post('/auth/logout', {}); } catch {}
@@ -128,68 +190,129 @@
     async function loadMentors() {
       try {
         const res = await api.get('/mentors/recommendations');
-        loading.style.display = 'none';
-
-        if (!res.recommendations || res.recommendations.length === 0) {
-          mentorsGrid.innerHTML = `
-            <div style="grid-column: 1 / -1; text-align: center; padding: var(--space-12); background: var(--color-surface); border-radius: var(--radius-lg); border: 1px solid var(--color-border);">
-              <h2 style="font-size: var(--text-lg); font-weight: 700; margin-bottom: var(--space-2);">No Available Mentors</h2>
-              <p style="color: var(--color-text-muted); font-size: var(--text-sm);">
-                All active alumni mentors are currently at capacity. Please check back soon or consult your coordinator.
-              </p>
-            </div>
-          `;
-          return;
-        }
-
-        mentorsGrid.innerHTML = '';
-        for (const item of res.recommendations) {
-          const m = item.mentor;
-          const card = document.createElement('article');
-          card.className = 'feature-card';
-          card.style.display = 'flex';
-          card.style.flexDirection = 'column';
-          card.style.justifyContent = 'space-between';
-
-          card.innerHTML = `
-            <div>
-              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-2);">
-                <h2 style="font-size: var(--text-lg); font-weight: 700;">${m.displayName}</h2>
-                <span style="font-size: var(--text-xs); background: var(--color-success-bg); color: var(--color-success); border: 1px solid var(--color-border); padding: 3px 10px; border-radius: 9999px; font-weight: 700;">
-                  ${m.availableSlots} slot(s) open
-                </span>
-              </div>
-              <p style="font-size: var(--text-sm); color: var(--color-text-muted); margin-bottom: var(--space-3);">
-                ${m.headline || m.currentRole || 'MCA Alumni Mentor'}
-              </p>
-
-              <!-- Explainable match rationale box -->
-              <div style="background: var(--color-surface-raised); border-left: 4px solid var(--color-brand-secondary); border-top: 1px solid var(--color-border); border-right: 1px solid var(--color-border); border-bottom: 1px solid var(--color-border); padding: var(--space-3); border-radius: 0 var(--radius) var(--radius) 0; margin-bottom: var(--space-4); font-size: var(--text-xs); color: var(--color-text); line-height: var(--leading-relaxed);">
-                <strong style="color: var(--color-brand-secondary);">Recommendation rationale:</strong><br />${item.explanation}
-              </div>
-            </div>
-
-            <button class="btn btn--primary open-request-btn" data-id="${m.userId}" data-name="${m.displayName}" style="width: 100%; font-size: var(--text-sm);">
-              Request Mentorship
-            </button>
-          `;
-
-          mentorsGrid.appendChild(card);
-        }
-
-        document.querySelectorAll('.open-request-btn').forEach((btn) => {
-          btn.addEventListener('click', () => {
-            const uid = btn.dataset.id;
-            const name = btn.dataset.name;
-            mentorIdInput.value = uid;
-            modalSubtitle.textContent = `Propose an introduction with ${name}.`;
-            modal.style.display = 'flex';
-          });
-        });
+        allRecommendations = res.recommendations || [];
+        applyFilters();
       } catch (err) {
-        loading.textContent = 'Failed to load mentors. Please try again.';
+        resultsCount.textContent = 'Failed to load mentors.';
       }
     }
+
+    function applyFilters() {
+      const search = searchInput.value.trim().toLowerCase();
+      
+      const filtered = allRecommendations.filter((item) => {
+        const m = item.mentor;
+        const matchesTopic = activeTopic === 'all' || 
+          (m.topics && m.topics.some(t => t.toLowerCase().includes(activeTopic.toLowerCase())));
+        
+        const matchesSearch = !search ||
+          m.displayName.toLowerCase().includes(search) ||
+          (m.headline && m.headline.toLowerCase().includes(search)) ||
+          (m.topics && m.topics.some(t => t.toLowerCase().includes(search)));
+
+        return matchesTopic && matchesSearch;
+      });
+
+      resultsCount.textContent = `Showing ${filtered.length} of ${allRecommendations.length} available mentors`;
+
+      if (search || activeTopic !== 'all') {
+        clearFiltersBtn.style.display = 'inline-flex';
+      } else {
+        clearFiltersBtn.style.display = 'none';
+      }
+
+      renderMentors(filtered);
+    }
+
+    function renderMentors(list) {
+      if (list.length === 0) {
+        mentorsGrid.style.display = 'none';
+        emptyState.style.display = 'block';
+        return;
+      }
+
+      mentorsGrid.style.display = 'grid';
+      emptyState.style.display = 'none';
+      mentorsGrid.innerHTML = '';
+
+      for (const item of list) {
+        const m = item.mentor;
+        const card = document.createElement('article');
+        card.className = 'feature-card';
+        card.style.display = 'flex';
+        card.style.flexDirection = 'column';
+        card.style.justifyContent = 'space-between';
+
+        const topicBadges = (m.topics || []).map(t => `<span class="topic-tag">${t}</span>`).join(' ');
+
+        card.innerHTML = `
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-2); gap: var(--space-2);">
+              <h2 style="font-size: var(--text-lg); font-weight: 700;">${m.displayName}</h2>
+              ${m.isTokenTwin 
+                ? '<span class="badge badge--twin">◈ Token Counterpart</span>'
+                : `<span class="badge badge--forest">${m.availableSlots} slots</span>`
+              }
+            </div>
+
+            <p style="font-size: var(--text-sm); color: var(--color-text-muted); margin-bottom: var(--space-3);">
+              ${m.headline || m.currentRole || 'MCA Alumni'}
+            </p>
+
+            <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: var(--space-3);">
+              ${topicBadges}
+            </div>
+
+            <div style="background: var(--color-surface-raised); border-left: 3px solid var(--color-brand-secondary); border-top: 1px solid var(--color-border-light); border-right: 1px solid var(--color-border-light); border-bottom: 1px solid var(--color-border-light); padding: var(--space-3); border-radius: 0 var(--radius) var(--radius) 0; margin-bottom: var(--space-4); font-size: var(--text-xs); color: var(--color-text); line-height: var(--leading-relaxed);">
+              <strong style="color: var(--color-brand-secondary);">Match rationale:</strong><br />${item.explanation}
+            </div>
+
+            ${m.scheduleNote ? `
+              <div style="font-size: var(--text-xs); color: var(--color-text-muted); margin-bottom: var(--space-4);">
+                🕒 <em>${m.scheduleNote}</em>
+              </div>
+            ` : ''}
+          </div>
+
+          <button class="btn btn--primary open-request-btn" data-id="${m.userId}" data-name="${m.displayName}" style="width: 100%; font-size: var(--text-sm);">
+            Request Mentorship
+          </button>
+        `;
+
+        mentorsGrid.appendChild(card);
+      }
+
+      document.querySelectorAll('.open-request-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          mentorIdInput.value = btn.dataset.id;
+          modalSubtitle.textContent = `Propose an introduction with ${btn.dataset.name}.`;
+          modal.style.display = 'flex';
+        });
+      });
+    }
+
+    // Filter event listeners
+    filterBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeTopic = btn.dataset.topic;
+        applyFilters();
+      });
+    });
+
+    searchInput.addEventListener('input', applyFilters);
+
+    function resetFilters() {
+      searchInput.value = '';
+      activeTopic = 'all';
+      filterBtns.forEach(b => b.classList.remove('active'));
+      document.querySelector('.filter-btn[data-topic="all"]')?.classList.add('active');
+      applyFilters();
+    }
+
+    clearFiltersBtn.addEventListener('click', resetFilters);
+    emptyResetBtn.addEventListener('click', resetFilters);
 
     modalCancelBtn.addEventListener('click', () => {
       modal.style.display = 'none';

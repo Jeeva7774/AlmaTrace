@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="/styles/main.css" />
 </head>
 <body>
-  <!-- Skip navigation for screen reader / keyboard users -->
+  <!-- Skip navigation for keyboard and screen reader accessibility -->
   <a href="#main-content" class="skip-link">Skip to main content</a>
 
   <header class="site-header" role="banner">
@@ -18,20 +18,22 @@
         <span class="site-header__name">ALMATRACE</span>
         <span class="site-header__dept">PSG MCA Department</span>
       </div>
-      <nav class="site-header__nav" aria-label="Main navigation">
-        <a href="/login.html" class="btn btn--outline">Sign In</a>
+      <nav class="site-header__nav" aria-label="Main navigation" style="display: flex; gap: var(--space-3); align-items: center;">
+        <a href="#how-it-works" style="color: var(--color-text-on-primary);">How It Works</a>
+        <a href="#tradition" style="color: var(--color-text-on-primary);">The Tradition</a>
+        <a href="/login.html" class="btn btn--outline" style="padding: var(--space-1) var(--space-3); font-size: var(--text-xs);">Sign In</a>
       </nav>
     </div>
   </header>
 
   <main id="main-content">
-    <!-- Development environment banner -->
+    
+    <!-- Synthetic preview banner -->
     <div class="env-banner" role="status" aria-live="polite">
-      ⚠️ <strong>Development environment</strong> — synthetic data only.
-      No real student or alumni records are present.
+      🛡️ <strong>Department of Computer Applications</strong> — ALMATRACE Digital Token System for MCA students & verified alumni.
     </div>
 
-    <!-- Hero section -->
+    <!-- Hero Section -->
     <section class="hero" aria-labelledby="hero-heading">
       <div class="container">
         <h1 id="hero-heading" class="hero__heading">
@@ -39,59 +41,96 @@
         </h1>
         <p class="hero__subheading">
           ALMATRACE connects MCA students with their token counterparts across
-          graduating batches — and helps find the right mentor when your primary
-          counterpart is unavailable.
+          graduating batches — fostering continuity, shared departmental identity,
+          and career mentorship.
         </p>
         <div class="hero__actions">
-          <a href="/register.html" class="btn btn--primary">Join the Programme</a>
-          <a href="#how-it-works" class="btn btn--ghost">How it works</a>
+          <a href="/register.html" class="btn btn--primary">Join the Programme →</a>
+          <a href="#how-it-works" class="btn btn--ghost">Explore the Roadmap</a>
         </div>
       </div>
     </section>
 
-    <!-- How it works -->
+    <!-- The Tradition Section -->
+    <section id="tradition" style="padding: var(--space-12) 0; background: var(--color-surface); border-bottom: 1.5px solid var(--color-border);">
+      <div class="container" style="max-width: 52rem; text-align: center;">
+        <span class="badge badge--forest" style="margin-bottom: var(--space-3);">THE PSG MCA TRADITION</span>
+        <h2 style="font-size: var(--text-2xl); font-weight: 800; margin-bottom: var(--space-4);">
+          Bridging Generations Through Roll-Number Lineage
+        </h2>
+        <p style="font-size: var(--text-base); color: var(--color-text-muted); line-height: var(--leading-relaxed); margin-bottom: var(--space-4);">
+          In the Department of MCA at PSG College of Technology, each student’s roll number carries a legacy. 
+          The sequence number links students to seniors who walked the exact same path years before. 
+          ALMATRACE honors this historical heritage by enabling verified token connections and structured guidance.
+        </p>
+        <div style="display: flex; justify-content: center; gap: var(--space-4); flex-wrap: wrap; margin-top: var(--space-6);">
+          <div style="background: var(--color-surface-raised); border: 1.5px solid var(--color-border); border-radius: var(--radius); padding: var(--space-4); min-width: 200px;">
+            <div style="font-size: var(--text-2xl); font-weight: 800; color: var(--color-brand-primary);">100%</div>
+            <div style="font-size: var(--text-xs); color: var(--color-text-muted); font-weight: 600;">Mutual Consent Model</div>
+          </div>
+          <div style="background: var(--color-surface-raised); border: 1.5px solid var(--color-border); border-radius: var(--radius); padding: var(--space-4); min-width: 200px;">
+            <div style="font-size: var(--text-2xl); font-weight: 800; color: var(--color-brand-secondary);">Zero</div>
+            <div style="font-size: var(--text-xs); color: var(--color-text-muted); font-weight: 600;">Public Email Exposure</div>
+          </div>
+          <div style="background: var(--color-surface-raised); border: 1.5px solid var(--color-border); border-radius: var(--radius); padding: var(--space-4); min-width: 200px;">
+            <div style="font-size: var(--text-2xl); font-weight: 800; color: var(--color-brand-primary);">Coordinator</div>
+            <div style="font-size: var(--text-xs); color: var(--color-text-muted); font-weight: 600;">Verified Affiliation</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How ALMATRACE Works: 4-Step Visual Roadmap -->
     <section id="how-it-works" class="features" aria-labelledby="features-heading">
       <div class="container">
-        <h2 id="features-heading">How ALMATRACE works</h2>
+        <h2 id="features-heading" style="margin-bottom: var(--space-2);">How ALMATRACE Works</h2>
+        <p style="text-align: center; color: var(--color-text-muted); font-size: var(--text-sm); max-width: 40rem; margin-inline: auto; margin-bottom: var(--space-8);">
+          A disciplined, privacy-safe journey from registration to 1:1 guidance sessions.
+        </p>
+
         <div class="features__grid" role="list">
 
           <article class="feature-card" role="listitem">
-            <span class="feature-card__icon" aria-hidden="true">✓</span>
-            <h3 class="feature-card__title">Verified Accounts</h3>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-2);">
+              <span class="feature-card__icon" aria-hidden="true" style="margin: 0;">1</span>
+              <span class="badge badge--sage">Verification</span>
+            </div>
+            <h3 class="feature-card__title">Institutional Registration</h3>
             <p class="feature-card__desc">
-              Register with your institutional email. Alumni accounts are
-              reviewed by a department coordinator before you appear in
-              mentor discovery.
+              Sign up with your college email. Alumni identities are verified by the MCA department coordinator before appearing in mentorship discovery.
             </p>
           </article>
 
           <article class="feature-card" role="listitem">
-            <span class="feature-card__icon" aria-hidden="true">⟷</span>
-            <h3 class="feature-card__title">Token Lineage</h3>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-2);">
+              <span class="feature-card__icon" aria-hidden="true" style="margin: 0;">2</span>
+              <span class="badge badge--sage">Lineage</span>
+            </div>
+            <h3 class="feature-card__title">Token Lineage Discovery</h3>
             <p class="feature-card__desc">
-              Your roll number carries a lineage. ALMATRACE identifies your
-              token counterpart across batches and shows you your shared history
-              — with their consent.
+              View your batch lineage sequence. If your primary counterpart is unavailable or at capacity, ALMATRACE suggests verified alumni based on shared topics.
             </p>
           </article>
 
           <article class="feature-card" role="listitem">
-            <span class="feature-card__icon" aria-hidden="true">⊕</span>
-            <h3 class="feature-card__title">Smart Fallbacks</h3>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-2);">
+              <span class="feature-card__icon" aria-hidden="true" style="margin: 0;">3</span>
+              <span class="badge badge--sage">Consent</span>
+            </div>
+            <h3 class="feature-card__title">Structured Request Lifecycle</h3>
             <p class="feature-card__desc">
-              If your primary counterpart isn't available, the system suggests
-              other verified alumni based on shared interests and goals —
-              always with a clear explanation.
+              A token match is not consent to mentorship. Active relationships require mutual agreement with clear objectives and meeting expectations.
             </p>
           </article>
 
           <article class="feature-card" role="listitem">
-            <span class="feature-card__icon" aria-hidden="true">◎</span>
-            <h3 class="feature-card__title">Consent First</h3>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-2);">
+              <span class="feature-card__icon" aria-hidden="true" style="margin: 0;">4</span>
+              <span class="badge badge--sage">Mentorship</span>
+            </div>
+            <h3 class="feature-card__title">Scheduled Guidance Sessions</h3>
             <p class="feature-card__desc">
-              A token match is a suggestion, not an agreement.
-              Mentorship only begins when both people explicitly accept.
-              You control your visibility, availability, and capacity.
+              Agreed pairs arrange structured sessions with meeting agendas and video links (Google Meet or campus meetings) with local IST scheduling.
             </p>
           </article>
 
@@ -99,33 +138,31 @@
       </div>
     </section>
 
-    <!-- Important notice -->
+    <!-- Important Notice Section -->
     <section class="notice-section" aria-labelledby="notice-heading">
       <div class="container">
         <div class="notice-card notice-card--info">
           <h2 id="notice-heading" class="notice-card__title">
-            Invitation-only programme
+            Departmental Code & Privacy Guarantee
           </h2>
           <p>
-            ALMATRACE is an internal departmental tool. Registration is open
-            only to current MCA students and verified MCA alumni of
-            PSG College of Technology.
+            ALMATRACE is an internal departmental platform for current MCA students and alumni of PSG College of Technology.
           </p>
           <p>
-            This is a <strong>mentorship and networking platform</strong>, not
-            a replacement for any institutional system, and does not provide
-            academic, medical, legal, or financial advice.
+            We strictly protect community privacy: personal email addresses and exact roll numbers are never published or shared. 
+            Mentors maintain full control over their capacity limits and availability.
           </p>
         </div>
       </div>
     </section>
+
   </main>
 
   <footer class="site-footer" role="contentinfo">
     <div class="container">
       <p>
         ALMATRACE — Department of MCA, PSG College of Technology.
-        For support, contact your department coordinator.
+        For inquiries or verification support, contact your department coordinator.
       </p>
       <nav class="site-footer__links" aria-label="Footer links">
         <a href="/privacy.html">Privacy Notice</a>

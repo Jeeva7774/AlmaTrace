@@ -133,37 +133,73 @@ const MOCK_STATE = {
         preferredModes: 'online',
         scheduleNote: 'Available Saturday mornings (IST)',
         availableSlots: 2,
+        isTokenTwin: true,
+        topics: ['Cloud Computing', 'Distributed Systems', 'Career Planning'],
       },
       score: 0.95,
-      explanation: 'Primary token lineage counterpart (Sequence 001). Shared guidance topics: Cloud Computing, Systems Design.',
+      explanation: 'Direct token lineage counterpart (Roll Sequence S24001 ⟷ A21001). Shared topics: Cloud Computing, Systems Architecture.',
     },
     {
       mentor: {
         userId: 'user-alumni-2',
         displayName: 'Rajan Pillai',
-        headline: 'Staff Software Engineer @ Thoughtworks',
+        headline: 'Staff Software Engineer @ Thoughtworks • PSG MCA 2021',
         currentRole: 'Staff Software Engineer',
         currentCompany: 'Thoughtworks',
         preferredModes: 'either',
         scheduleNote: 'Weekends & weekday evenings',
         availableSlots: 3,
+        isTokenTwin: false,
+        topics: ['Software Engineering', 'System Design', 'Interview Prep'],
       },
       score: 0.88,
-      explanation: 'Shared topics: Software Development, Career Planning. Has 3 available mentorship slots.',
+      explanation: 'Shared topics: Software Development, Interview Prep. Has 3 available mentorship slots this semester.',
     },
     {
       mentor: {
         userId: 'user-alumni-3',
         displayName: 'Sowmya Nair',
-        headline: 'AI/ML Research Scientist @ Google DeepMind',
+        headline: 'AI/ML Research Scientist @ Google DeepMind • PSG MCA 2022',
         currentRole: 'Research Scientist',
         currentCompany: 'Google DeepMind',
         preferredModes: 'online',
-        scheduleNote: 'Bi-weekly Sunday calls',
+        scheduleNote: 'Bi-weekly Sunday morning calls',
         availableSlots: 1,
+        isTokenTwin: false,
+        topics: ['Machine Learning & AI', 'Higher Education', 'Research'],
       },
       score: 0.82,
-      explanation: 'Topic overlap: Machine Learning & AI, Higher Education & Research. Convenient online mode.',
+      explanation: 'Topic overlap: Machine Learning, Research & Higher Studies. Convenient matching online mode.',
+    },
+  ],
+  relationships: [
+    {
+      id: 'ship-1',
+      mentor_id: 'user-alumni-1',
+      mentor_name: 'Meena Suresh',
+      mentor_headline: 'Senior Cloud Architect @ AWS • PSG MCA 2023',
+      mentee_id: '00000000-0000-0000-0002-000000000001',
+      mentee_name: 'Arjun Dev',
+      status: 'active',
+      started_at: new Date(Date.now() - 86400000 * 5).toISOString(),
+      purpose: 'Cloud Architecture & Systems Design Discussion',
+      preferred_mode: 'online',
+    },
+  ],
+  meetings: [
+    {
+      id: 'm-1',
+      mentorship_id: 'ship-1',
+      mentor_name: 'Meena Suresh',
+      mentee_name: 'Arjun Dev',
+      purpose: 'Cloud Architecture & Systems Design Discussion',
+      status: 'confirmed',
+      scheduled_at: new Date(Date.now() + 86400000 * 2).toISOString(),
+      duration_minutes: 45,
+      mode: 'online',
+      location_or_link: 'https://meet.google.com/psg-mca-guidance',
+      agenda: 'Review distributed systems semester project and discuss cloud career paths.',
+      time_zone: 'Asia/Kolkata',
     },
   ],
   requests: {
@@ -276,9 +312,85 @@ const server = http.createServer((req, res) => {
       return res.end(JSON.stringify({ tokenLineage: MOCK_STATE.tokenLineage }));
     }
     if (pathname === '/api/v1/mentors/recommendations') {
-      return res.end(JSON.stringify({ recommendations: MOCK_STATE.recommendations }));
+      const topicFilter = url.searchParams.get('topic');
+      const searchQuery = (url.searchParams.get('search') || '').toLowerCase();
+
+      let filtered = [...MOCK_STATE.recommendations];
+      if (topicFilter && topicFilter !== 'all') {
+        filtered = filtered.filter((r) =>
+          r.mentor.topics && r.mentor.topics.some((t) => t.toLowerCase().includes(topicFilter.toLowerCase()))
+        );
+      }
+      if (searchQuery) {
+        filtered = filtered.filter((r) =>
+          r.mentor.displayName.toLowerCase().includes(searchQuery) ||
+          (r.mentor.headline && r.mentor.headline.toLowerCase().includes(searchQuery)) ||
+          (r.mentor.topics && r.mentor.topics.some((t) => t.toLowerCase().includes(searchQuery)))
+        );
+      }
+
+      return res.end(JSON.stringify({ recommendations: filtered }));
+    }
+    if (pathname === '/api/v1/mentorship/relationships') {
+      return res.end(JSON.stringify({ relationships: MOCK_STATE.relationships }));
+    }
+    if (pathname === '/api/v1/mentorship/meetings') {
+      if (req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => { body += chunk; });
+        req.on('end', () => {
+          try {
+            const data = JSON.parse(body);
+            const newMeeting = {
+              id: `m-${Date.now()}`,
+              mentorship_id: data.mentorshipId || 'ship-1',
+              mentor_name: 'Meena Suresh',
+              mentee_name: 'Arjun Dev',
+              purpose: data.purpose || 'Mentorship Sync',
+              status: 'confirmed',
+              scheduled_at: data.scheduledAt || new Date(Date.now() + 86400000).toISOString(),
+              duration_minutes: Number(data.durationMinutes) || 45,
+              mode: data.mode || 'online',
+              location_or_link: data.locationOrLink || 'https://meet.google.com/psg-mca-guidance',
+              agenda: data.agenda || '',
+              time_zone: 'Asia/Kolkata',
+            };
+            MOCK_STATE.meetings.unshift(newMeeting);
+            res.end(JSON.stringify({ message: 'Meeting scheduled.', meeting: newMeeting }));
+          } catch {
+            res.statusCode = 400;
+            res.end(JSON.stringify({ error: 'Invalid meeting payload' }));
+          }
+        });
+        return;
+      }
+      return res.end(JSON.stringify({ meetings: MOCK_STATE.meetings }));
     }
     if (pathname === '/api/v1/mentorship/requests') {
+      if (req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => { body += chunk; });
+        req.on('end', () => {
+          try {
+            const data = JSON.parse(body);
+            const newReq = {
+              id: `req-out-${Date.now()}`,
+              mentor_id: data.mentorId,
+              mentor_name: 'Meena Suresh',
+              status: 'sent',
+              purpose: data.purpose || 'Mentorship Request',
+              message: data.message || '',
+              created_at: new Date().toISOString(),
+            };
+            MOCK_STATE.requests.outgoing.unshift(newReq);
+            res.end(JSON.stringify({ message: 'Request created.', request: newReq }));
+          } catch {
+            res.statusCode = 400;
+            res.end(JSON.stringify({ error: 'Invalid request' }));
+          }
+        });
+        return;
+      }
       return res.end(JSON.stringify(MOCK_STATE.requests));
     }
     if (pathname.startsWith('/api/v1/mentorship/requests/') && req.method === 'PATCH') {
