@@ -1,0 +1,9 @@
+{
+  "name": "almatrace-client",
+  "version": "0.1.0",
+  "private": true,
+  "description": "ALMATRACE client — static HTML/CSS/JS",
+  "scripts": {
+    "build": "echo 'No build step required for vanilla JS client.'"
+  }
+}

@@ -1,0 +1,410 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   ALMATRACE — main.css
+   Design system: custom properties → base reset → layout → components
+
+   Principles:
+   - Mobile-first responsive (min-width breakpoints)
+   - WCAG 2.2 AA: 4.5:1 contrast for normal text, 3:1 for large text
+   - Respect prefers-reduced-motion
+   - System font stack — no external font requests (privacy + performance)
+   - BEM naming convention: block__element--modifier
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* ── 1. Custom properties (design tokens) ────────────────────────────────── */
+:root {
+  /* Colour palette — PSG blue family */
+  --color-brand-primary:   #1a3a6e;   /* PSG dark blue */
+  --color-brand-secondary: #2563eb;   /* interactive blue */
+  --color-brand-accent:    #f59e0b;   /* amber accent */
+
+  /* Semantic colours */
+  --color-bg:              #f8fafc;
+  --color-surface:         #ffffff;
+  --color-surface-raised:  #f1f5f9;
+  --color-border:          #cbd5e1;
+  --color-text:            #1e293b;
+  --color-text-muted:      #64748b;
+  --color-text-on-primary: #ffffff;
+
+  /* Status colours */
+  --color-success:         #16a34a;
+  --color-warning:         #d97706;
+  --color-error:           #dc2626;
+  --color-info:            #0284c7;
+
+  /* Spacing (8-point grid) */
+  --space-1:  0.25rem;   /* 4px  */
+  --space-2:  0.5rem;    /* 8px  */
+  --space-3:  0.75rem;   /* 12px */
+  --space-4:  1rem;      /* 16px */
+  --space-6:  1.5rem;    /* 24px */
+  --space-8:  2rem;      /* 32px */
+  --space-12: 3rem;      /* 48px */
+  --space-16: 4rem;      /* 64px */
+
+  /* Typography */
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, monospace;
+
+  --text-xs:   0.75rem;
+  --text-sm:   0.875rem;
+  --text-base: 1rem;
+  --text-lg:   1.125rem;
+  --text-xl:   1.25rem;
+  --text-2xl:  1.5rem;
+  --text-3xl:  1.875rem;
+  --text-4xl:  2.25rem;
+
+  --leading-tight:  1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+
+  /* Border radius */
+  --radius-sm: 0.25rem;
+  --radius:    0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow:    0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+
+  /* Layout */
+  --container-max: 72rem;  /* 1152px */
+  --container-pad: var(--space-4);
+}
+
+/* Dark mode (system preference) — placeholder for future work */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg:           #0f172a;
+    --color-surface:      #1e293b;
+    --color-surface-raised: #334155;
+    --color-border:       #475569;
+    --color-text:         #f1f5f9;
+    --color-text-muted:   #94a3b8;
+  }
+}
+
+/* ── 2. Base reset ────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 100%;       /* 1rem = 16px; respect user preference */
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+img, video { max-width: 100%; display: block; }
+a { color: var(--color-brand-secondary); }
+a:hover { text-decoration: underline; }
+
+/* Visible focus indicator — required for WCAG 2.2 AA */
+:focus-visible {
+  outline: 3px solid var(--color-brand-secondary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ── 3. Skip link (accessibility) ────────────────────────────────────────── */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: var(--space-4);
+  background: var(--color-brand-primary);
+  color: var(--color-text-on-primary);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius);
+  font-weight: 600;
+  text-decoration: none;
+  z-index: 9999;
+  transition: top 0.2s;
+}
+.skip-link:focus { top: var(--space-2); }
+
+/* ── 4. Layout utilities ─────────────────────────────────────────────────── */
+.container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--container-pad);
+}
+
+@media (min-width: 640px) {
+  :root { --container-pad: var(--space-6); }
+}
+@media (min-width: 1024px) {
+  :root { --container-pad: var(--space-8); }
+}
+
+/* ── 5. Site header ──────────────────────────────────────────────────────── */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--color-brand-primary);
+  color: var(--color-text-on-primary);
+  border-bottom: 2px solid var(--color-brand-accent);
+  box-shadow: var(--shadow-md);
+}
+
+.site-header .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-block: var(--space-3);
+}
+
+.site-header__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.site-header__logo {
+  font-size: var(--text-xl);
+  color: var(--color-brand-accent);
+}
+
+.site-header__name {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--color-text-on-primary);
+}
+
+.site-header__dept {
+  font-size: var(--text-xs);
+  opacity: 0.8;
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .site-header__dept { display: inline; }
+}
+
+/* ── 6. Buttons ──────────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  font-family: inherit;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: 1;
+  border-radius: var(--radius);
+  border: 2px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+
+.btn--primary {
+  background: var(--color-brand-secondary);
+  color: var(--color-text-on-primary);
+  border-color: var(--color-brand-secondary);
+}
+.btn--primary:hover {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+  text-decoration: none;
+}
+
+.btn--outline {
+  background: transparent;
+  color: var(--color-text-on-primary);
+  border-color: var(--color-text-on-primary);
+}
+.btn--outline:hover {
+  background: rgb(255 255 255 / 0.15);
+  text-decoration: none;
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--color-brand-secondary);
+  border-color: transparent;
+}
+.btn--ghost:hover {
+  background: var(--color-surface-raised);
+  text-decoration: none;
+}
+
+/* ── 7. Environment banner ───────────────────────────────────────────────── */
+.env-banner {
+  background: #fef3c7;
+  color: #92400e;
+  text-align: center;
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-sm);
+  border-bottom: 1px solid #fde68a;
+}
+
+/* ── 8. Hero section ─────────────────────────────────────────────────────── */
+.hero {
+  background: linear-gradient(135deg, var(--color-brand-primary) 0%, #1e40af 100%);
+  color: var(--color-text-on-primary);
+  padding: var(--space-16) 0;
+  text-align: center;
+}
+
+.hero__heading {
+  font-size: var(--text-3xl);
+  font-weight: 800;
+  line-height: var(--leading-tight);
+  margin-bottom: var(--space-4);
+}
+
+@media (min-width: 768px) {
+  .hero__heading { font-size: var(--text-4xl); }
+}
+
+.hero__subheading {
+  font-size: var(--text-lg);
+  opacity: 0.9;
+  max-width: 42rem;
+  margin-inline: auto;
+  margin-bottom: var(--space-8);
+  line-height: var(--leading-relaxed);
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  justify-content: center;
+}
+
+.hero .btn--ghost {
+  color: var(--color-text-on-primary);
+  border-color: rgb(255 255 255 / 0.5);
+}
+.hero .btn--ghost:hover {
+  background: rgb(255 255 255 / 0.15);
+}
+
+/* ── 9. Features grid ────────────────────────────────────────────────────── */
+.features {
+  padding: var(--space-16) 0;
+}
+
+.features h2 {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  margin-bottom: var(--space-8);
+  text-align: center;
+}
+
+.features__grid {
+  display: grid;
+  gap: var(--space-6);
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+  .features__grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 1024px) {
+  .features__grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+.feature-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-sm);
+}
+
+.feature-card__icon {
+  font-size: var(--text-2xl);
+  color: var(--color-brand-secondary);
+  display: block;
+  margin-bottom: var(--space-3);
+}
+
+.feature-card__title {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  margin-bottom: var(--space-2);
+}
+
+.feature-card__desc {
+  color: var(--color-text-muted);
+  line-height: var(--leading-relaxed);
+  font-size: var(--text-sm);
+}
+
+/* ── 10. Notice card ─────────────────────────────────────────────────────── */
+.notice-section {
+  padding: var(--space-8) 0 var(--space-16);
+}
+
+.notice-card {
+  border-radius: var(--radius-lg);
+  padding: var(--space-6) var(--space-8);
+  border-left: 4px solid;
+}
+
+.notice-card--info {
+  background: #eff6ff;
+  border-color: var(--color-brand-secondary);
+}
+
+.notice-card__title {
+  font-size: var(--text-xl);
+  font-weight: 700;
+  margin-bottom: var(--space-3);
+}
+
+.notice-card p + p { margin-top: var(--space-3); }
+
+/* ── 11. Site footer ─────────────────────────────────────────────────────── */
+.site-footer {
+  background: var(--color-brand-primary);
+  color: rgb(255 255 255 / 0.8);
+  padding: var(--space-8) 0;
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
+.site-footer__links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-4);
+  margin-top: var(--space-3);
+}
+
+.site-footer__links a {
+  color: rgb(255 255 255 / 0.7);
+}
+.site-footer__links a:hover {
+  color: var(--color-text-on-primary);
+}

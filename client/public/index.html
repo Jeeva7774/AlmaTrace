@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="ALMATRACE — Digital Department Token System for PSG MCA alumni mentorship." />
+  <title>ALMATRACE — PSG MCA Token System</title>
+  <link rel="stylesheet" href="/styles/main.css" />
+</head>
+<body>
+  <!-- Skip navigation for screen reader / keyboard users -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="site-header" role="banner">
+    <div class="container">
+      <div class="site-header__brand">
+        <span class="site-header__logo" aria-hidden="true">◈</span>
+        <span class="site-header__name">ALMATRACE</span>
+        <span class="site-header__dept">PSG MCA Department</span>
+      </div>
+      <nav class="site-header__nav" aria-label="Main navigation">
+        <a href="/login.html" class="btn btn--outline">Sign In</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <!-- Development environment banner -->
+    <div class="env-banner" role="status" aria-live="polite">
+      ⚠️ <strong>Development environment</strong> — synthetic data only.
+      No real student or alumni records are present.
+    </div>
+
+    <!-- Hero section -->
+    <section class="hero" aria-labelledby="hero-heading">
+      <div class="container">
+        <h1 id="hero-heading" class="hero__heading">
+          Your Token. Your Lineage. Your Mentor.
+        </h1>
+        <p class="hero__subheading">
+          ALMATRACE connects MCA students with their token counterparts across
+          graduating batches — and helps find the right mentor when your primary
+          counterpart is unavailable.
+        </p>
+        <div class="hero__actions">
+          <a href="/register.html" class="btn btn--primary">Join the Programme</a>
+          <a href="#how-it-works" class="btn btn--ghost">How it works</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- How it works -->
+    <section id="how-it-works" class="features" aria-labelledby="features-heading">
+      <div class="container">
+        <h2 id="features-heading">How ALMATRACE works</h2>
+        <div class="features__grid" role="list">
+
+          <article class="feature-card" role="listitem">
+            <span class="feature-card__icon" aria-hidden="true">✓</span>
+            <h3 class="feature-card__title">Verified Accounts</h3>
+            <p class="feature-card__desc">
+              Register with your institutional email. Alumni accounts are
+              reviewed by a department coordinator before you appear in
+              mentor discovery.
+            </p>
+          </article>
+
+          <article class="feature-card" role="listitem">
+            <span class="feature-card__icon" aria-hidden="true">⟷</span>
+            <h3 class="feature-card__title">Token Lineage</h3>
+            <p class="feature-card__desc">
+              Your roll number carries a lineage. ALMATRACE identifies your
+              token counterpart across batches and shows you your shared history
+              — with their consent.
+            </p>
+          </article>
+
+          <article class="feature-card" role="listitem">
+            <span class="feature-card__icon" aria-hidden="true">⊕</span>
+            <h3 class="feature-card__title">Smart Fallbacks</h3>
+            <p class="feature-card__desc">
+              If your primary counterpart isn't available, the system suggests
+              other verified alumni based on shared interests and goals —
+              always with a clear explanation.
+            </p>
+          </article>
+
+          <article class="feature-card" role="listitem">
+            <span class="feature-card__icon" aria-hidden="true">◎</span>
+            <h3 class="feature-card__title">Consent First</h3>
+            <p class="feature-card__desc">
+              A token match is a suggestion, not an agreement.
+              Mentorship only begins when both people explicitly accept.
+              You control your visibility, availability, and capacity.
+            </p>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Important notice -->
+    <section class="notice-section" aria-labelledby="notice-heading">
+      <div class="container">
+        <div class="notice-card notice-card--info">
+          <h2 id="notice-heading" class="notice-card__title">
+            Invitation-only programme
+          </h2>
+          <p>
+            ALMATRACE is an internal departmental tool. Registration is open
+            only to current MCA students and verified MCA alumni of
+            PSG College of Technology.
+          </p>
+          <p>
+            This is a <strong>mentorship and networking platform</strong>, not
+            a replacement for any institutional system, and does not provide
+            academic, medical, legal, or financial advice.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer" role="contentinfo">
+    <div class="container">
+      <p>
+        ALMATRACE — Department of MCA, PSG College of Technology.
+        For support, contact your department coordinator.
+      </p>
+      <nav class="site-footer__links" aria-label="Footer links">
+        <a href="/privacy.html">Privacy Notice</a>
+        <a href="/conduct.html">Code of Conduct</a>
+        <a href="/accessibility.html">Accessibility</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>

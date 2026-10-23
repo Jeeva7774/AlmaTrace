@@ -1,0 +1,57 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Environment / secrets — never commit
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Build output
+dist/
+build/
+client/public/bundle/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor directories
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Temporary / scratch
+tmp/
+temp/
+*.tmp
+*.bak
+
+# Import files — must not be committed; contain personal data
+server/imports/uploads/
+*.csv.import
+
+# Migration lock (not applicable to our simple runner, but guard it)
+# schema_migrations is tracked in DB only
+
+# Synthetic seed data is in scripts/ — real data must NEVER be committed
+# real_data/
+# production_seeds/

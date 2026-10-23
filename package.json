@@ -1,0 +1,57 @@
+{
+  "name": "almatrace",
+  "version": "0.1.0",
+  "description": "ALMATRACE — Digital Department Token System (PSG MCA)",
+  "private": true,
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
+  },
+  "scripts": {
+    "dev": "npm run dev --workspace=server",
+    "start": "npm run start --workspace=server",
+    "migrate": "npm run migrate --workspace=server",
+    "migrate:status": "npm run migrate:status --workspace=server",
+    "seed": "npm run seed --workspace=server",
+    "test": "npm test --workspace=server",
+    "lint": "eslint . --ext .js --ignore-path .gitignore",
+    "format": "prettier --write \"**/*.{js,json,md,css,html}\" --ignore-path .gitignore",
+    "format:check": "prettier --check \"**/*.{js,json,md,css,html}\" --ignore-path .gitignore",
+    "server:install": "npm install --workspace=server"
+  },
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "prettier": "^3.2.5"
+  },
+  "eslintConfig": {
+    "env": {
+      "node": true,
+      "es2022": true,
+      "jest": true
+    },
+    "parserOptions": {
+      "ecmaVersion": 2022,
+      "sourceType": "module"
+    },
+    "extends": [
+      "eslint:recommended"
+    ],
+    "rules": {
+      "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
+      "no-console": "off",
+      "prefer-const": "error",
+      "no-var": "error"
+    }
+  },
+  "prettier": {
+    "singleQuote": true,
+    "semi": true,
+    "tabWidth": 2,
+    "trailingComma": "es5",
+    "printWidth": 100
+  }
+}
