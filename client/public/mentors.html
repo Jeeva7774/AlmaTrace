@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Discover alternative department mentors on ALMATRACE." />
+  <title>Find Mentors — ALMATRACE</title>
+  <link rel="stylesheet" href="/styles/main.css" />
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="site-header" role="banner">
+    <div class="container">
+      <div class="site-header__brand">
+        <a href="/dashboard.html" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: var(--space-2);">
+          <span class="site-header__logo" aria-hidden="true">◈</span>
+          <span class="site-header__name">ALMATRACE</span>
+        </a>
+      </div>
+      <nav class="site-header__nav" aria-label="Main navigation" style="display: flex; gap: var(--space-3); align-items: center;">
+        <a href="/dashboard.html" style="color: var(--color-text-on-primary); text-decoration: none;">Dashboard</a>
+        <a href="/lineage.html" style="color: var(--color-text-on-primary); text-decoration: none;">Lineage</a>
+        <a href="/mentors.html" style="color: var(--color-brand-accent); font-weight: 700; text-decoration: none;">Find Mentors</a>
+        <a href="/requests.html" style="color: var(--color-text-on-primary); text-decoration: none;">Requests</a>
+        <button id="logout-btn" class="btn btn--outline" style="padding: var(--space-1) var(--space-3); font-size: var(--text-xs);">Logout</button>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content" class="container" style="padding-block: var(--space-8);">
+    <div style="margin-bottom: var(--space-6);">
+      <h1 style="font-size: var(--text-3xl); font-weight: 800; margin-bottom: var(--space-2);">Department Mentors</h1>
+      <p style="color: var(--color-text-muted); font-size: var(--text-sm);">
+        Verified MCA alumni available for structured guidance. Recommendations are rule-based, explainable, and respect mentor capacity limits.
+      </p>
+    </div>
+
+    <div id="loading" style="text-align: center; padding: var(--space-8); color: var(--color-text-muted);">
+      Loading recommended mentors...
+    </div>
+
+    <div id="mentors-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: var(--space-6);">
+      <!-- Mentors rendered here -->
+    </div>
+
+    <!-- Request Modal -->
+    <div id="request-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; padding: var(--space-4);" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div style="background: var(--color-surface); width: 100%; max-width: 32rem; border-radius: var(--radius-lg); padding: var(--space-6); box-shadow: var(--shadow-md);">
+        <h2 id="modal-title" style="font-size: var(--text-xl); font-weight: 700; margin-bottom: var(--space-2);">Send Mentorship Request</h2>
+        <p id="modal-subtitle" style="font-size: var(--text-sm); color: var(--color-text-muted); margin-bottom: var(--space-4);"></p>
+
+        <form id="request-form">
+          <input type="hidden" id="mentor-id" />
+
+          <div style="margin-bottom: var(--space-4);">
+            <label for="purpose" style="display: block; font-weight: 600; font-size: var(--text-sm); margin-bottom: var(--space-1);">
+              Objective / Guidance Topic <span aria-hidden="true" style="color: var(--color-error);">*</span>
+            </label>
+            <input
+              type="text"
+              id="purpose"
+              required
+              placeholder="e.g. Guidance on Systems Programming and Cloud Architectures"
+              style="width: 100%; padding: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius); font-size: var(--text-base);"
+            />
+          </div>
+
+          <div style="margin-bottom: var(--space-4);">
+            <label for="preferred-mode" style="display: block; font-weight: 600; font-size: var(--text-sm); margin-bottom: var(--space-1);">
+              Preferred Meeting Mode
+            </label>
+            <select
+              id="preferred-mode"
+              style="width: 100%; padding: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius); font-size: var(--text-base); background: var(--color-surface);"
+            >
+              <option value="online">Online Video / Voice Call</option>
+              <option value="in_person">In-Person (Campus)</option>
+              <option value="either">Either</option>
+            </select>
+          </div>
+
+          <div style="margin-bottom: var(--space-6);">
+            <label for="message" style="display: block; font-weight: 600; font-size: var(--text-sm); margin-bottom: var(--space-1);">
+              Introductory Message
+            </label>
+            <textarea
+              id="message"
+              rows="3"
+              placeholder="Briefly describe what questions you'd like to explore and your availability..."
+              style="width: 100%; padding: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius); font-size: var(--text-base); font-family: inherit;"
+            ></textarea>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: var(--space-3);">
+            <button type="button" id="modal-cancel-btn" class="btn btn--ghost">Cancel</button>
+            <button type="submit" id="modal-submit-btn" class="btn btn--primary">Send Request</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer" role="contentinfo">
+    <div class="container">
+      <p>ALMATRACE — Department of MCA, PSG College of Technology.</p>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { ApiClient } from '/js/services/api.js';
+
+    const api = new ApiClient('/api/v1');
+    const mentorsGrid = document.getElementById('mentors-grid');
+    const loading = document.getElementById('loading');
+    const modal = document.getElementById('request-modal');
+    const modalTitle = document.getElementById('modal-title');
+    const modalSubtitle = document.getElementById('modal-subtitle');
+    const mentorIdInput = document.getElementById('mentor-id');
+    const modalCancelBtn = document.getElementById('modal-cancel-btn');
+    const requestForm = document.getElementById('request-form');
+
+    document.getElementById('logout-btn').addEventListener('click', async () => {
+      try { await api.post('/auth/logout', {}); } catch {}
+      window.location.href = '/login.html';
+    });
+
+    async function loadMentors() {
+      try {
+        const res = await api.get('/mentors/recommendations');
+        loading.style.display = 'none';
+
+        if (!res.recommendations || res.recommendations.length === 0) {
+          mentorsGrid.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: var(--space-12); background: var(--color-surface); border-radius: var(--radius-lg); border: 1px solid var(--color-border);">
+              <h2 style="font-size: var(--text-lg); font-weight: 700; margin-bottom: var(--space-2);">No Available Mentors</h2>
+              <p style="color: var(--color-text-muted); font-size: var(--text-sm);">
+                All active alumni mentors are currently at capacity. Please check back soon or consult your coordinator.
+              </p>
+            </div>
+          `;
+          return;
+        }
+
+        mentorsGrid.innerHTML = '';
+        for (const item of res.recommendations) {
+          const m = item.mentor;
+          const card = document.createElement('article');
+          card.className = 'feature-card';
+          card.style.display = 'flex';
+          card.style.flexDirection = 'column';
+          card.style.justifyContent = 'space-between';
+
+          card.innerHTML = `
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-2);">
+                <h2 style="font-size: var(--text-lg); font-weight: 700;">${m.displayName}</h2>
+                <span style="font-size: var(--text-xs); background: #dcfce7; color: #15803d; padding: 2px 8px; border-radius: 9999px; font-weight: 700;">
+                  ${m.availableSlots} slot(s) open
+                </span>
+              </div>
+              <p style="font-size: var(--text-sm); color: var(--color-text-muted); margin-bottom: var(--space-3);">
+                ${m.headline || m.currentRole || 'MCA Alumni Mentor'}
+              </p>
+
+              <!-- Explainable match rationale box -->
+              <div style="background: #eff6ff; border-left: 3px solid var(--color-brand-secondary); padding: var(--space-3); border-radius: 0 var(--radius) var(--radius) 0; margin-bottom: var(--space-4); font-size: var(--text-xs); color: #1e40af;">
+                <strong>Recommendation rationale:</strong><br />${item.explanation}
+              </div>
+            </div>
+
+            <button class="btn btn--primary open-request-btn" data-id="${m.userId}" data-name="${m.displayName}" style="width: 100%; font-size: var(--text-sm);">
+              Request Mentorship
+            </button>
+          `;
+
+          mentorsGrid.appendChild(card);
+        }
+
+        document.querySelectorAll('.open-request-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const uid = btn.dataset.id;
+            const name = btn.dataset.name;
+            mentorIdInput.value = uid;
+            modalSubtitle.textContent = `Propose an introduction with ${name}.`;
+            modal.style.display = 'flex';
+          });
+        });
+      } catch (err) {
+        loading.textContent = 'Failed to load mentors. Please try again.';
+      }
+    }
+
+    modalCancelBtn.addEventListener('click', () => {
+      modal.style.display = 'none';
+    });
+
+    requestForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const mentorId = mentorIdInput.value;
+      const purpose = document.getElementById('purpose').value.trim();
+      const preferredMode = document.getElementById('preferred-mode').value;
+      const message = document.getElementById('message').value.trim();
+      const idempotencyKey = `req_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+
+      try {
+        await api.post('/mentorship/requests', {
+          mentorId,
+          purpose,
+          preferredMode,
+          message,
+          idempotencyKey,
+        });
+
+        modal.style.display = 'none';
+        alert('Mentorship request sent successfully!');
+        window.location.href = '/requests.html';
+      } catch (err) {
+        alert(err.message || 'Failed to send request.');
+      }
+    });
+
+    loadMentors();
+  </script>
+</body>
+</html>

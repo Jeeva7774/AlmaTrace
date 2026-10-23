@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="ALMATRACE Department Coordinator Operations Dashboard" />
+  <title>Coordinator Dashboard — ALMATRACE</title>
+  <link rel="stylesheet" href="/styles/main.css" />
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="site-header" role="banner">
+    <div class="container">
+      <div class="site-header__brand">
+        <a href="/admin.html" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: var(--space-2);">
+          <span class="site-header__logo" aria-hidden="true">◈</span>
+          <span class="site-header__name">ALMATRACE</span>
+          <span style="background: var(--color-brand-accent); color: var(--color-text); font-size: var(--text-xs); font-weight: 700; padding: 2px 6px; border-radius: var(--radius-sm); margin-left: var(--space-2);">
+            Coordinator
+          </span>
+        </a>
+      </div>
+      <nav class="site-header__nav" aria-label="Main navigation" style="display: flex; gap: var(--space-3); align-items: center;">
+        <a href="/admin.html" style="color: var(--color-brand-accent); font-weight: 700; text-decoration: none;">Admin Console</a>
+        <a href="/dashboard.html" style="color: var(--color-text-on-primary); text-decoration: none;">User View</a>
+        <button id="logout-btn" class="btn btn--outline" style="padding: var(--space-1) var(--space-3); font-size: var(--text-xs);">Logout</button>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content" class="container" style="padding-block: var(--space-8);">
+    <div style="margin-bottom: var(--space-6);">
+      <h1 style="font-size: var(--text-3xl); font-weight: 800; margin-bottom: var(--space-2);">Department Operations</h1>
+      <p style="color: var(--color-text-muted); font-size: var(--text-sm);">
+        Review verification requests, inspect aggregate program metrics, and monitor audit trails.
+      </p>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div style="display: flex; gap: var(--space-3); border-bottom: 2px solid var(--color-border); margin-bottom: var(--space-6); overflow-x: auto;">
+      <button id="tab-verify" class="btn btn--ghost tab-btn" style="border-bottom: 2px solid var(--color-brand-secondary); color: var(--color-brand-secondary); font-weight: 700; border-radius: 0;">
+        Verification Queue
+      </button>
+      <button id="tab-metrics" class="btn btn--ghost tab-btn" style="color: var(--color-text-muted); border-radius: 0;">
+        Operations Metrics
+      </button>
+      <button id="tab-audit" class="btn btn--ghost tab-btn" style="color: var(--color-text-muted); border-radius: 0;">
+        Audit Log
+      </button>
+      <button id="tab-reports" class="btn btn--ghost tab-btn" style="color: var(--color-text-muted); border-radius: 0;">
+        Safety Reports
+      </button>
+    </div>
+
+    <!-- 1. Verification Queue Panel -->
+    <section id="panel-verify">
+      <div id="verify-list" style="display: flex; flex-direction: column; gap: var(--space-4);">
+        <p style="color: var(--color-text-muted);">Loading verification queue...</p>
+      </div>
+    </section>
+
+    <!-- 2. Operations Metrics Panel -->
+    <section id="panel-metrics" style="display: none;">
+      <div class="notice-card notice-card--info" style="margin-bottom: var(--space-6);">
+        <p style="font-size: var(--text-xs);">
+          🔒 <strong>Privacy Policy:</strong> Counts for groups with fewer than 5 members are automatically suppressed (masked as <code>&lt; 5</code>) to prevent deanonymization.
+        </p>
+      </div>
+      <div id="metrics-content" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-6);">
+        <p style="color: var(--color-text-muted);">Loading aggregate metrics...</p>
+      </div>
+    </section>
+
+    <!-- 3. Audit Log Panel -->
+    <section id="panel-audit" style="display: none;">
+      <div style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse; font-size: var(--text-sm); text-align: left;">
+          <thead>
+            <tr style="border-bottom: 1px solid var(--color-border); background: var(--color-surface-raised);">
+              <th style="padding: var(--space-3) var(--space-4);">Timestamp</th>
+              <th style="padding: var(--space-3) var(--space-4);">Action</th>
+              <th style="padding: var(--space-3) var(--space-4);">Actor</th>
+              <th style="padding: var(--space-3) var(--space-4);">Target</th>
+            </tr>
+          </thead>
+          <tbody id="audit-table-body">
+            <tr><td colspan="4" style="padding: var(--space-4); text-align: center; color: var(--color-text-muted);">Loading audit events...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 4. Safety Reports Panel -->
+    <section id="panel-reports" style="display: none;">
+      <div id="reports-list">
+        <p style="color: var(--color-text-muted);">Loading reports...</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer" role="contentinfo">
+    <div class="container">
+      <p>ALMATRACE — Department of MCA, PSG College of Technology.</p>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { ApiClient } from '/js/services/api.js';
+
+    const api = new ApiClient('/api/v1');
+
+    document.getElementById('logout-btn').addEventListener('click', async () => {
+      try { await api.post('/auth/logout', {}); } catch {}
+      window.location.href = '/login.html';
+    });
+
+    // Check coordinator authorization
+    async function checkCoordinator() {
+      try {
+        const session = await api.get('/auth/session');
+        if (!session.authenticated || (session.user.role !== 'coordinator' && session.user.role !== 'sysadmin')) {
+          alert('Coordinator access required.');
+          window.location.href = '/dashboard.html';
+        }
+      } catch {
+        window.location.href = '/login.html';
+      }
+    }
+    checkCoordinator();
+
+    // Tab switching
+    const tabs = [
+      { btn: document.getElementById('tab-verify'), panel: document.getElementById('panel-verify'), load: loadVerifications },
+      { btn: document.getElementById('tab-metrics'), panel: document.getElementById('panel-metrics'), load: loadMetrics },
+      { btn: document.getElementById('tab-audit'), panel: document.getElementById('panel-audit'), load: loadAudit },
+      { btn: document.getElementById('tab-reports'), panel: document.getElementById('panel-reports'), load: loadReports },
+    ];
+
+    tabs.forEach(({ btn, panel, load }) => {
+      btn.addEventListener('click', () => {
+        tabs.forEach((t) => {
+          t.btn.style.borderBottom = 'none';
+          t.btn.style.color = 'var(--color-text-muted)';
+          t.btn.style.fontWeight = 'normal';
+          t.panel.style.display = 'none';
+        });
+        btn.style.borderBottom = '2px solid var(--color-brand-secondary)';
+        btn.style.color = 'var(--color-brand-secondary)';
+        btn.style.fontWeight = '700';
+        panel.style.display = 'block';
+        load();
+      });
+    });
+
+    async function loadVerifications() {
+      const container = document.getElementById('verify-list');
+      try {
+        const res = await api.get('/admin/verifications');
+        const list = res.verifications || [];
+
+        if (list.length === 0) {
+          container.innerHTML = `<p style="padding: var(--space-8); text-align: center; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius); color: var(--color-text-muted);">Verification queue is clear! No pending submissions.</p>`;
+          return;
+        }
+
+        container.innerHTML = '';
+        for (const item of list) {
+          const card = document.createElement('article');
+          card.className = 'feature-card';
+          card.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-3); flex-wrap: wrap; gap: var(--space-2);">
+              <div>
+                <h2 style="font-size: var(--text-lg); font-weight: 700;">${item.display_name}</h2>
+                <div style="font-size: var(--text-sm); color: var(--color-text-muted);">
+                  ${item.email} • Role: <strong>${item.member_type.toUpperCase()}</strong> • Cohort: <strong>${item.cohort_label}</strong>
+                </div>
+              </div>
+              <span style="font-size: var(--text-xs); background: #fef3c7; color: #b45309; padding: 2px 8px; border-radius: 9999px; font-weight: 700;">
+                ${item.affiliation_status.toUpperCase()}
+              </span>
+            </div>
+
+            <div style="background: var(--color-surface-raised); padding: var(--space-3); border-radius: var(--radius); margin-bottom: var(--space-4); font-size: var(--text-sm);">
+              <strong>Submitted Identifier / Token:</strong> <code>${item.raw_identifier}</code> (Normalized: <code>${item.normalized_token_key}</code>)
+            </div>
+
+            <div style="display: flex; gap: var(--space-2); justify-content: flex-end;">
+              <button class="btn btn--ghost reject-btn" data-id="${item.id}" style="font-size: var(--text-xs); color: var(--color-error);">Reject</button>
+              <button class="btn btn--primary approve-btn" data-id="${item.id}" style="font-size: var(--text-xs);">Approve & Verify</button>
+            </div>
+          `;
+          container.appendChild(card);
+        }
+
+        document.querySelectorAll('.approve-btn').forEach((btn) => {
+          btn.addEventListener('click', async () => {
+            btn.disabled = true;
+            try {
+              await api.post(`/admin/verifications/${btn.dataset.id}/decision`, { decision: 'verified' });
+              loadVerifications();
+            } catch (err) {
+              alert(err.message || 'Failed to approve');
+              btn.disabled = false;
+            }
+          });
+        });
+
+        document.querySelectorAll('.reject-btn').forEach((btn) => {
+          btn.addEventListener('click', async () => {
+            if (!confirm('Reject this affiliation?')) return;
+            btn.disabled = true;
+            try {
+              await api.post(`/admin/verifications/${btn.dataset.id}/decision`, { decision: 'rejected' });
+              loadVerifications();
+            } catch (err) {
+              alert(err.message || 'Failed to reject');
+              btn.disabled = false;
+            }
+          });
+        });
+      } catch (err) {
+        container.innerHTML = `<p style="color: var(--color-error);">Failed to load verification queue.</p>`;
+      }
+    }
+
+    async function loadMetrics() {
+      const container = document.getElementById('metrics-content');
+      try {
+        const res = await api.get('/admin/metrics');
+        container.innerHTML = `
+          <div class="feature-card">
+            <h2 style="font-size: var(--text-base); font-weight: 700; margin-bottom: var(--space-3);">Active Accounts</h2>
+            ${(res.users || []).map((u) => `<div style="display: flex; justify-content: space-between; padding-block: var(--space-1); border-bottom: 1px solid var(--color-border);"><span>${u.role} (${u.status})</span><strong style="font-family: var(--font-mono);">${u.count}</strong></div>`).join('')}
+          </div>
+
+          <div class="feature-card">
+            <h2 style="font-size: var(--text-base); font-weight: 700; margin-bottom: var(--space-3);">Mentorship Relationships</h2>
+            ${(res.mentorships || []).map((m) => `<div style="display: flex; justify-content: space-between; padding-block: var(--space-1); border-bottom: 1px solid var(--color-border);"><span>Status: ${m.status}</span><strong style="font-family: var(--font-mono);">${m.count}</strong></div>`).join('')}
+          </div>
+
+          <div class="feature-card">
+            <h2 style="font-size: var(--text-base); font-weight: 700; margin-bottom: var(--space-3);">Request Activity</h2>
+            ${(res.requests || []).map((r) => `<div style="display: flex; justify-content: space-between; padding-block: var(--space-1); border-bottom: 1px solid var(--color-border);"><span>${r.status}</span><strong style="font-family: var(--font-mono);">${r.count}</strong></div>`).join('')}
+          </div>
+        `;
+      } catch (err) {
+        container.innerHTML = `<p style="color: var(--color-error);">Failed to load operational metrics.</p>`;
+      }
+    }
+
+    async function loadAudit() {
+      const tbody = document.getElementById('audit-table-body');
+      try {
+        const res = await api.get('/admin/audit-logs');
+        const events = res.auditEvents || [];
+
+        if (events.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="4" style="padding: var(--space-4); text-align: center; color: var(--color-text-muted);">No audit events recorded yet.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = events.map((ev) => `
+          <tr style="border-bottom: 1px solid var(--color-border);">
+            <td style="padding: var(--space-2) var(--space-4); font-size: var(--text-xs); color: var(--color-text-muted);">${new Date(ev.created_at).toLocaleString()}</td>
+            <td style="padding: var(--space-2) var(--space-4); font-weight: 700; font-family: var(--font-mono); font-size: var(--text-xs);">${ev.action}</td>
+            <td style="padding: var(--space-2) var(--space-4);">${ev.actor_email || 'System'}</td>
+            <td style="padding: var(--space-2) var(--space-4); font-size: var(--text-xs);">${ev.target_type || '-'} (${ev.target_id || '-'})</td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="4" style="padding: var(--space-4); text-align: center; color: var(--color-error);">Failed to load audit logs.</td></tr>`;
+      }
+    }
+
+    async function loadReports() {
+      const container = document.getElementById('reports-list');
+      try {
+        const res = await api.get('/admin/reports');
+        const reports = res.reports || [];
+
+        if (reports.length === 0) {
+          container.innerHTML = `<p style="padding: var(--space-8); text-align: center; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius); color: var(--color-text-muted);">No safety reports submitted.</p>`;
+          return;
+        }
+
+        container.innerHTML = reports.map((r) => `
+          <article class="feature-card" style="margin-bottom: var(--space-4);">
+            <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-2);">
+              <strong>Category: ${r.category}</strong>
+              <span style="font-size: var(--text-xs); background: #fef2f2; color: var(--color-error); padding: 2px 8px; border-radius: 9999px;">${r.status}</span>
+            </div>
+            <div style="font-size: var(--text-sm); color: var(--color-text-muted);">
+              Reported User: ${r.reported_email} • Submitted: ${new Date(r.created_at).toLocaleDateString()}
+            </div>
+          </article>
+        `).join('');
+      } catch (err) {
+        container.innerHTML = `<p style="color: var(--color-error);">Failed to load reports.</p>`;
+      }
+    }
+
+    loadVerifications();
+  </script>
+</body>
+</html>

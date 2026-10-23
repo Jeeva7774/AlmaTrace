@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="ALMATRACE Member Dashboard" />
+  <title>Dashboard — ALMATRACE</title>
+  <link rel="stylesheet" href="/styles/main.css" />
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="site-header" role="banner">
+    <div class="container">
+      <div class="site-header__brand">
+        <a href="/dashboard.html" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: var(--space-2);">
+          <span class="site-header__logo" aria-hidden="true">◈</span>
+          <span class="site-header__name">ALMATRACE</span>
+        </a>
+      </div>
+      <nav class="site-header__nav" aria-label="Main navigation" style="display: flex; gap: var(--space-3); align-items: center;">
+        <a href="/dashboard.html" style="color: var(--color-brand-accent); font-weight: 700; text-decoration: none;">Dashboard</a>
+        <a href="/lineage.html" style="color: var(--color-text-on-primary); text-decoration: none;">Lineage</a>
+        <a href="/mentors.html" style="color: var(--color-text-on-primary); text-decoration: none;">Find Mentors</a>
+        <a href="/requests.html" style="color: var(--color-text-on-primary); text-decoration: none;">Requests</a>
+        <button id="logout-btn" class="btn btn--outline" style="padding: var(--space-1) var(--space-3); font-size: var(--text-xs);">Logout</button>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content" class="container" style="padding-block: var(--space-8);">
+    <!-- User Welcome Header -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-8); flex-wrap: wrap; gap: var(--space-4);">
+      <div>
+        <h1 id="user-greeting" style="font-size: var(--text-3xl); font-weight: 800;">Welcome back!</h1>
+        <p id="user-subtext" style="color: var(--color-text-muted); font-size: var(--text-sm);">Loading your profile and cohort records...</p>
+      </div>
+      <div id="status-badge-container"></div>
+    </div>
+
+    <!-- Main Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: var(--space-6);">
+
+      <!-- 1. Token Lineage Card -->
+      <section class="feature-card" aria-labelledby="token-card-heading">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-3);">
+          <h2 id="token-card-heading" style="font-size: var(--text-lg); font-weight: 700;">Your Token Lineage</h2>
+          <span style="font-size: var(--text-xs); background: #e0f2fe; color: #0369a1; padding: 2px 8px; border-radius: 9999px; font-weight: 600;">Historical Match</span>
+        </div>
+        <p style="font-size: var(--text-sm); color: var(--color-text-muted); margin-bottom: var(--space-4);">
+          Token matching derives from your department sequence. An introduction requires explicit mutual consent.
+        </p>
+
+        <div id="counterpart-info" style="background: var(--color-surface-raised); padding: var(--space-4); border-radius: var(--radius); margin-bottom: var(--space-4);">
+          <p style="font-size: var(--text-sm);">Loading counterpart records...</p>
+        </div>
+
+        <div style="display: flex; gap: var(--space-2);">
+          <a href="/lineage.html" class="btn btn--primary" style="flex: 1; font-size: var(--text-sm);">View Batch Lineage</a>
+          <a href="/mentors.html" class="btn btn--ghost" style="font-size: var(--text-sm); border: 1px solid var(--color-border);">Explore Fallbacks</a>
+        </div>
+      </section>
+
+      <!-- 2. Mentorship Requests Card -->
+      <section class="feature-card" aria-labelledby="requests-card-heading">
+        <h2 id="requests-card-heading" style="font-size: var(--text-lg); font-weight: 700; margin-bottom: var(--space-3);">Mentorship Requests</h2>
+        <div id="requests-summary" style="margin-bottom: var(--space-4);">
+          <p style="font-size: var(--text-sm); color: var(--color-text-muted);">Loading requests...</p>
+        </div>
+        <a href="/requests.html" class="btn btn--primary" style="width: 100%; font-size: var(--text-sm);">Open Requests Workspace</a>
+      </section>
+
+      <!-- 3. Scheduled Meetings Card -->
+      <section class="feature-card" aria-labelledby="meetings-card-heading">
+        <h2 id="meetings-card-heading" style="font-size: var(--text-lg); font-weight: 700; margin-bottom: var(--space-3);">Upcoming Meetings</h2>
+        <div id="meetings-summary" style="margin-bottom: var(--space-4);">
+          <p style="font-size: var(--text-sm); color: var(--color-text-muted);">No upcoming meetings scheduled.</p>
+        </div>
+        <p style="font-size: var(--text-xs); color: var(--color-text-muted);">
+          All meeting times are stored in UTC and rendered in your local time zone.
+        </p>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="site-footer" role="contentinfo">
+    <div class="container">
+      <p>ALMATRACE — Department of MCA, PSG College of Technology.</p>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { ApiClient } from '/js/services/api.js';
+
+    const api = new ApiClient('/api/v1');
+    const logoutBtn = document.getElementById('logout-btn');
+
+    logoutBtn.addEventListener('click', async () => {
+      try {
+        await api.post('/auth/logout', {});
+      } catch {}
+      window.location.href = '/login.html';
+    });
+
+    async function loadDashboard() {
+      try {
+        // Check session
+        const session = await api.get('/auth/session');
+        if (!session.authenticated) {
+          window.location.href = '/login.html';
+          return;
+        }
+
+        // Load profile and memberships
+        const me = await api.get('/me');
+        document.getElementById('user-greeting').textContent = `Hello, ${me.profile?.display_name || 'Member'}!`;
+
+        const primaryMem = me.memberships?.find((m) => m.is_primary) || me.memberships?.[0];
+        document.getElementById('user-subtext').textContent = primaryMem
+          ? `${primaryMem.department_name} • ${primaryMem.cohort_label} • Token Key: ${primaryMem.normalized_token_key}`
+          : 'ALMATRACE Mentorship Programme';
+
+        const statusContainer = document.getElementById('status-badge-container');
+        const isVerified = primaryMem?.affiliation_status === 'verified';
+        statusContainer.innerHTML = isVerified
+          ? `<span style="background: #dcfce7; color: #15803d; padding: 4px 12px; border-radius: 9999px; font-weight: 700; font-size: var(--text-xs);">✓ Verified ${me.user.role}</span>`
+          : `<span style="background: #fef3c7; color: #b45309; padding: 4px 12px; border-radius: 9999px; font-weight: 700; font-size: var(--text-xs);">⏳ Verification Pending</span>`;
+
+        // Load counterpart lineage info
+        try {
+          const lineage = await api.get('/me/token-lineage');
+          const cpInfo = document.getElementById('counterpart-info');
+          const timeline = lineage.tokenLineage?.timeline || [];
+          const counterparts = timeline.filter((t) => t.state !== 'self');
+
+          const activeCp = counterparts.find((c) => c.state === 'active');
+          if (activeCp) {
+            cpInfo.innerHTML = `
+              <div style="font-weight: 700; font-size: var(--text-base); margin-bottom: 2px;">
+                ${activeCp.counterpart.displayName}
+              </div>
+              <div style="font-size: var(--text-sm); color: var(--color-text-muted); margin-bottom: var(--space-2);">
+                ${activeCp.counterpart.headline || activeCp.counterpart.currentRole || 'MCA Alumni'} • ${activeCp.cohortLabel}
+              </div>
+              <span style="font-size: var(--text-xs); color: var(--color-success); font-weight: 600;">
+                ● Active on ALMATRACE ${activeCp.counterpart.acceptingRequests ? '(Accepting Mentees)' : '(At Capacity)'}
+              </span>
+            `;
+          } else {
+            cpInfo.innerHTML = `
+              <div style="font-size: var(--text-sm); color: var(--color-text-muted);">
+                Your primary token counterpart has not yet joined or verified on the platform.
+              </div>
+              <div style="margin-top: var(--space-2); font-size: var(--text-xs); font-weight: 600; color: var(--color-info);">
+                Use the Alternative Mentor Discovery to connect with other verified alumni!
+              </div>
+            `;
+          }
+        } catch (err) {
+          document.getElementById('counterpart-info').innerHTML = `<p style="font-size: var(--text-sm); color: var(--color-text-muted);">Lineage preview available once verified.</p>`;
+        }
+
+        // Load requests
+        try {
+          const requests = await api.get('/mentorship/requests');
+          const totalIncoming = requests.incoming?.filter((r) => r.status === 'sent').length || 0;
+          const totalOutgoing = requests.outgoing?.filter((r) => r.status === 'sent').length || 0;
+
+          document.getElementById('requests-summary').innerHTML = `
+            <div style="display: flex; gap: var(--space-4);">
+              <div style="padding: var(--space-3); background: var(--color-surface-raised); border-radius: var(--radius); flex: 1; text-align: center;">
+                <div style="font-size: var(--text-2xl); font-weight: 800;">${totalIncoming}</div>
+                <div style="font-size: var(--text-xs); color: var(--color-text-muted);">Incoming Pending</div>
+              </div>
+              <div style="padding: var(--space-3); background: var(--color-surface-raised); border-radius: var(--radius); flex: 1; text-align: center;">
+                <div style="font-size: var(--text-2xl); font-weight: 800;">${totalOutgoing}</div>
+                <div style="font-size: var(--text-xs); color: var(--color-text-muted);">Outgoing Pending</div>
+              </div>
+            </div>
+          `;
+        } catch {}
+
+      } catch (err) {
+        window.location.href = '/login.html';
+      }
+    }
+
+    loadDashboard();
+  </script>
+</body>
+</html>

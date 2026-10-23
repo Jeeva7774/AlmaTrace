@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="ALMATRACE Accessibility Commitment" />
+  <title>Accessibility — ALMATRACE</title>
+  <link rel="stylesheet" href="/styles/main.css" />
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <header class="site-header" role="banner">
+    <div class="container">
+      <div class="site-header__brand">
+        <a href="/" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: var(--space-2);">
+          <span class="site-header__logo" aria-hidden="true">◈</span>
+          <span class="site-header__name">ALMATRACE</span>
+        </a>
+      </div>
+      <nav class="site-header__nav"><a href="/login.html" class="btn btn--outline">Sign In</a></nav>
+    </div>
+  </header>
+
+  <main id="main-content" class="container" style="max-width: 48rem; padding-block: var(--space-12);">
+    <h1 style="font-size: var(--text-3xl); font-weight: 800; margin-bottom: var(--space-4);">Accessibility Commitment</h1>
+    <p style="color: var(--color-text-muted); font-size: var(--text-sm); margin-bottom: var(--space-6);">Target: WCAG 2.2 Level AA</p>
+
+    <section class="feature-card" style="margin-bottom: var(--space-6);">
+      <h2 style="font-size: var(--text-xl); font-weight: 700; margin-bottom: var(--space-3);">Standards and Guidelines</h2>
+      <p style="font-size: var(--text-sm); color: var(--color-text-muted); line-height: var(--leading-relaxed);">
+        ALMATRACE is committed to ensuring digital accessibility for all students, alumni, and coordinators. Key accessibility features include:
+      </p>
+      <ul style="margin-left: var(--space-6); font-size: var(--text-sm); color: var(--color-text-muted); margin-top: var(--space-2); line-height: var(--leading-relaxed);">
+        <li>Full keyboard accessibility with visible high-contrast focus rings (<code>:focus-visible</code>).</li>
+        <li>Accessible semantic HTML structure with ARIA landmark roles and live regions for error alerts.</li>
+        <li>WCAG AA contrast ratios (minimum 4.5:1 for body text, 3:1 for headers).</li>
+        <li>Respect for <code>prefers-reduced-motion</code> system preferences.</li>
+        <li>Skip-to-content links on every page for efficient keyboard and screen-reader navigation.</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="site-footer" role="contentinfo">
+    <div class="container"><p>ALMATRACE — Department of MCA, PSG College of Technology.</p></div>
+  </footer>
+</body>
+</html>

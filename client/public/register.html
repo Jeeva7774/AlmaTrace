@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Register for ALMATRACE — PSG MCA Department Token System." />
+  <title>Register — ALMATRACE</title>
+  <link rel="stylesheet" href="/styles/main.css" />
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header class="site-header" role="banner">
+    <div class="container">
+      <div class="site-header__brand">
+        <a href="/" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: var(--space-2);">
+          <span class="site-header__logo" aria-hidden="true">◈</span>
+          <span class="site-header__name">ALMATRACE</span>
+        </a>
+      </div>
+      <nav class="site-header__nav" aria-label="Main navigation">
+        <a href="/login.html" class="btn btn--outline">Sign In</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content" class="container" style="max-width: 36rem; padding-block: var(--space-12);">
+    <div class="feature-card" style="padding: var(--space-8);">
+      <h1 style="font-size: var(--text-2xl); font-weight: 800; margin-bottom: var(--space-2);">Join the Programme</h1>
+      <p style="color: var(--color-text-muted); font-size: var(--text-sm); margin-bottom: var(--space-6);">
+        Register with your PSG institutional email to discover your token heritage and connect with department mentors.
+      </p>
+
+      <div id="error-summary" class="notice-card" style="display: none; background: #fef2f2; border-color: var(--color-error); margin-bottom: var(--space-6); padding: var(--space-4);" role="alert" aria-live="assertive">
+        <p id="error-message" style="color: var(--color-error); font-weight: 600; font-size: var(--text-sm);"></p>
+      </div>
+
+      <div id="success-box" class="notice-card" style="display: none; background: #f0fdf4; border-color: var(--color-success); margin-bottom: var(--space-6); padding: var(--space-4);" role="status">
+        <h2 style="font-size: var(--text-base); color: var(--color-success); font-weight: 700; margin-bottom: var(--space-2);">Account Created!</h2>
+        <p id="success-message" style="font-size: var(--text-sm); color: #166534;"></p>
+        <div id="dev-verify-section" style="margin-top: var(--space-4); display: none;">
+          <button id="dev-verify-btn" class="btn btn--primary" style="font-size: var(--text-sm);">Verify Account Instantly (Dev Mode)</button>
+        </div>
+      </div>
+
+      <form id="register-form" novalidate>
+        <div style="margin-bottom: var(--space-4);">
+          <label for="displayName" style="display: block; font-weight: 600; font-size: var(--text-sm); margin-bottom: var(--space-1);">
+            Full Name <span aria-hidden="true" style="color: var(--color-error);">*</span>
+          </label>
+          <input
+            type="text"
+            id="displayName"
+            name="displayName"
+            required
+            placeholder="e.g. Arjun Dev"
+            style="width: 100%; padding: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius); font-size: var(--text-base);"
+          />
+        </div>
+
+        <div style="margin-bottom: var(--space-4);">
+          <label for="email" style="display: block; font-weight: 600; font-size: var(--text-sm); margin-bottom: var(--space-1);">
+            Institutional Email Address <span aria-hidden="true" style="color: var(--color-error);">*</span>
+          </label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            required
+            placeholder="e.g. yourname@psgtech.ac.in"
+            style="width: 100%; padding: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius); font-size: var(--text-base);"
+          />
+        </div>
+
+        <div style="margin-bottom: var(--space-4);">
+          <label for="password" style="display: block; font-weight: 600; font-size: var(--text-sm); margin-bottom: var(--space-1);">
+            Password <span aria-hidden="true" style="color: var(--color-error);">*</span>
+            <small style="display: block; font-weight: normal; color: var(--color-text-muted);">Minimum 8 characters with at least one uppercase letter and one number.</small>
+          </label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            required
+            autocomplete="new-password"
+            style="width: 100%; padding: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius); font-size: var(--text-base);"
+          />
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); margin-bottom: var(--space-4);">
+          <div>
+            <label for="role" style="display: block; font-weight: 600; font-size: var(--text-sm); margin-bottom: var(--space-1);">
+              Role <span aria-hidden="true" style="color: var(--color-error);">*</span>
+            </label>
+            <select
+              id="role"
+              name="role"
+              required
+              style="width: 100%; padding: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius); font-size: var(--text-base); background: var(--color-surface);"
+            >
+              <option value="student">Current Student</option>
+              <option value="alumni">MCA Alumni / Mentor</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="cohortId" style="display: block; font-weight: 600; font-size: var(--text-sm); margin-bottom: var(--space-1);">
+              Cohort / Batch <span aria-hidden="true" style="color: var(--color-error);">*</span>
+            </label>
+            <select
+              id="cohortId"
+              name="cohortId"
+              required
+              style="width: 100%; padding: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius); font-size: var(--text-base); background: var(--color-surface);"
+            >
+              <option value="">Loading cohorts...</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="margin-bottom: var(--space-6);">
+          <label for="rawIdentifier" style="display: block; font-weight: 600; font-size: var(--text-sm); margin-bottom: var(--space-1);">
+            Roll Number / Token Identifier <span aria-hidden="true" style="color: var(--color-error);">*</span>
+            <small style="display: block; font-weight: normal; color: var(--color-text-muted);">
+              Used exclusively to identify your cross-cohort token counterpart. Never displayed publicly to other users.
+            </small>
+          </label>
+          <input
+            type="text"
+            id="rawIdentifier"
+            name="rawIdentifier"
+            required
+            placeholder="e.g. 24MX001 or S24001"
+            style="width: 100%; padding: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius); font-size: var(--text-base);"
+          />
+        </div>
+
+        <div style="margin-bottom: var(--space-6); background: var(--color-surface-raised); padding: var(--space-4); border-radius: var(--radius);">
+          <label style="display: flex; gap: var(--space-2); align-items: flex-start; font-size: var(--text-sm); cursor: pointer;">
+            <input type="checkbox" id="consent" required style="margin-top: 0.25rem;" />
+            <span>
+              I agree to the <a href="/conduct.html" target="_blank">Code of Conduct</a> and <a href="/privacy.html" target="_blank">Privacy Notice (v1.0)</a>. I understand that token matching is an invitation to connect, not consent to mentorship.
+            </span>
+          </label>
+        </div>
+
+        <button type="submit" id="submit-btn" class="btn btn--primary" style="width: 100%; padding-block: var(--space-3);">
+          Create Account
+        </button>
+      </form>
+    </div>
+  </main>
+
+  <footer class="site-footer" role="contentinfo">
+    <div class="container">
+      <p>ALMATRACE — Department of MCA, PSG College of Technology.</p>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { ApiClient } from '/js/services/api.js';
+
+    const api = new ApiClient('/api/v1');
+    const form = document.getElementById('register-form');
+    const cohortSelect = document.getElementById('cohortId');
+    const errorSummary = document.getElementById('error-summary');
+    const errorMessage = document.getElementById('error-message');
+    const successBox = document.getElementById('success-box');
+    const successMessage = document.getElementById('success-message');
+    const devVerifySection = document.getElementById('dev-verify-section');
+    const devVerifyBtn = document.getElementById('dev-verify-btn');
+    const submitBtn = document.getElementById('submit-btn');
+
+    let devToken = null;
+
+    // Load available departments and cohorts
+    async function loadCohorts() {
+      try {
+        const data = await api.get('/departments');
+        cohortSelect.innerHTML = '';
+        let foundAny = false;
+
+        for (const dept of data.departments || []) {
+          for (const prog of dept.programs || []) {
+            for (const cohort of prog.cohorts || []) {
+              foundAny = true;
+              const opt = document.createElement('option');
+              opt.value = cohort.id;
+              opt.textContent = `${cohort.label} (${prog.degree || 'MCA'})`;
+              cohortSelect.appendChild(opt);
+            }
+          }
+        }
+
+        if (!foundAny) {
+          cohortSelect.innerHTML = '<option value="">No cohorts available</option>';
+        }
+      } catch (err) {
+        cohortSelect.innerHTML = '<option value="">Failed to load cohorts</option>';
+      }
+    }
+
+    loadCohorts();
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorSummary.style.display = 'none';
+
+      const displayName = document.getElementById('displayName').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const role = document.getElementById('role').value;
+      const cohortId = document.getElementById('cohortId').value;
+      const rawIdentifier = document.getElementById('rawIdentifier').value.trim();
+      const consent = document.getElementById('consent').checked;
+
+      if (!consent) {
+        errorMessage.textContent = 'You must agree to the Code of Conduct and Privacy Notice to register.';
+        errorSummary.style.display = 'block';
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Registering...';
+
+      try {
+        const res = await api.post('/auth/register', {
+          displayName,
+          email,
+          password,
+          role,
+          cohortId,
+          rawIdentifier,
+          consentVersion: '1.0',
+        });
+
+        form.style.display = 'none';
+        successBox.style.display = 'block';
+        successMessage.textContent = 'Your account has been registered. Please verify your email to activate it.';
+
+        if (res.devVerificationToken) {
+          devToken = res.devVerificationToken;
+          devVerifySection.style.display = 'block';
+        }
+      } catch (err) {
+        errorMessage.textContent = err.message || 'Registration failed. Please check your inputs.';
+        errorSummary.style.display = 'block';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Create Account';
+      }
+    });
+
+    devVerifyBtn.addEventListener('click', async () => {
+      if (!devToken) return;
+      devVerifyBtn.disabled = true;
+      devVerifyBtn.textContent = 'Verifying...';
+
+      try {
+        await api.post('/auth/verify-email', { token: devToken });
+        successMessage.textContent = 'Email verified successfully! You can now sign in.';
+        devVerifySection.innerHTML = '<a href="/login.html" class="btn btn--primary">Proceed to Sign In</a>';
+      } catch (err) {
+        alert(err.message || 'Verification failed');
+      }
+    });
+  </script>
+</body>
+</html>
