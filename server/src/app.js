@@ -35,6 +35,13 @@ import { httpLogger } from './middleware/httpLogger.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 
 import healthRouter from './routes/health.js';
+import { authenticateSession } from './middleware/auth.js';
+import authRouter from './modules/auth/authRoutes.js';
+import profileRouter from './modules/people/profileRoutes.js';
+import adminRouter from './modules/admin/adminRoutes.js';
+import departmentRouter from './modules/departments/departmentRoutes.js';
+import matchingRouter from './modules/matching/matchingRoutes.js';
+import mentorshipRouter from './modules/mentorship/mentorshipRoutes.js';
 
 const PgSession = connectPgSimple(session);
 
@@ -116,6 +123,9 @@ export function createApp() {
     })
   );
 
+  // Populate req.user from session if authenticated
+  app.use(authenticateSession);
+
   // ── 7. Global rate limiter ────────────────────────────────────────────────
   // A loose global limit; tighter limits are applied per sensitive route.
   const globalLimiter = rateLimit({
@@ -141,11 +151,13 @@ export function createApp() {
 
   // ── 9. API routes ─────────────────────────────────────────────────────────
   app.use('/api/v1', healthRouter);
-
-  // Placeholder: additional routers will be registered here as modules are built
-  // app.use('/api/v1/auth', authRouter);
-  // app.use('/api/v1/me', meRouter);
-  // app.use('/api/v1/admin', adminRouter);
+  app.use('/api/v1/auth', authRouter);
+  app.use('/api/v1', profileRouter);
+  app.use('/api/v1/admin', adminRouter);
+  app.use('/api/v1/departments', departmentRouter);
+  app.use('/api/v1/me', matchingRouter);
+  app.use('/api/v1/mentors', matchingRouter);
+  app.use('/api/v1/mentorship', mentorshipRouter);
 
   // ── 10. 404 handler ───────────────────────────────────────────────────────
   app.use(notFoundHandler);

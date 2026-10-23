@@ -9,7 +9,10 @@
  * minimum length but are never logged or included in error messages.
  */
 
+import 'dotenv/config';
 import { z } from 'zod';
+
+const isTest = process.env.NODE_ENV === 'test';
 
 const envSchema = z.object({
   // ── Application ──────────────────────────────────────────────────────────
@@ -19,19 +22,23 @@ const envSchema = z.object({
   APP_NAME: z.string().min(1).default('ALMATRACE'),
 
   // ── Database ─────────────────────────────────────────────────────────────
-  DATABASE_URL: z.string().min(1, 'DATABASE_URL is required'),
+  DATABASE_URL: isTest
+    ? z.string().default('postgres://localhost/almatrace_test')
+    : z.string().min(1, 'DATABASE_URL is required'),
   DB_POOL_MIN: z.coerce.number().int().min(0).default(2),
   DB_POOL_MAX: z.coerce.number().int().min(1).default(10),
   DB_STATEMENT_TIMEOUT_MS: z.coerce.number().int().min(0).default(30000),
 
   // ── Session ──────────────────────────────────────────────────────────────
-  SESSION_SECRET: z
-    .string()
-    .min(32, 'SESSION_SECRET must be at least 32 characters')
-    .refine(
-      (v) => !v.includes('REPLACE_WITH'),
-      'SESSION_SECRET must be replaced with a real secret'
-    ),
+  SESSION_SECRET: isTest
+    ? z.string().default('test_session_secret_at_least_32_chars_long_for_unit_tests')
+    : z
+        .string()
+        .min(32, 'SESSION_SECRET must be at least 32 characters')
+        .refine(
+          (v) => !v.includes('REPLACE_WITH'),
+          'SESSION_SECRET must be replaced with a real secret'
+        ),
   SESSION_MAX_AGE_MS: z.coerce.number().int().min(60000).default(28800000),
   SESSION_SECURE: z
     .string()

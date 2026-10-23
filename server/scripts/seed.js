@@ -26,7 +26,8 @@
 
 import 'dotenv/config';
 import pg from 'pg';
-import { hash as argon2Hash, verify as argon2Verify, Algorithm } from '@node-rs/argon2';
+import bcrypt from 'bcryptjs';
+import { v4 as uuidv4 } from 'uuid';
 
 const DB_URL = process.env.DATABASE_URL;
 if (!DB_URL) {
@@ -99,12 +100,7 @@ const INTERESTS = [
 ];
 
 async function hashPassword(plain) {
-  return argon2.hash(plain, {
-    type: argon2.argon2id,
-    memoryCost: 65536,
-    timeCost: 3,
-    parallelism: 1,
-  });
+  return bcrypt.hash(plain, 12);
 }
 
 async function seedUser(id, email, name, role, passwordHash) {
