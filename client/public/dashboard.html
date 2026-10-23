@@ -45,7 +45,7 @@
       <section class="feature-card" aria-labelledby="token-card-heading">
         <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-3);">
           <h2 id="token-card-heading" style="font-size: var(--text-lg); font-weight: 700;">Your Token Lineage</h2>
-          <span style="font-size: var(--text-xs); background: #e0f2fe; color: #0369a1; padding: 2px 8px; border-radius: 9999px; font-weight: 600;">Historical Match</span>
+          <span style="font-size: var(--text-xs); background: var(--color-surface-raised); color: var(--color-text); border: 1px solid var(--color-border); padding: 3px 10px; border-radius: 9999px; font-weight: 700;">Historical Match</span>
         </div>
         <p style="font-size: var(--text-sm); color: var(--color-text-muted); margin-bottom: var(--space-4);">
           Token matching derives from your department sequence. An introduction requires explicit mutual consent.
@@ -124,8 +124,8 @@
         const statusContainer = document.getElementById('status-badge-container');
         const isVerified = primaryMem?.affiliation_status === 'verified';
         statusContainer.innerHTML = isVerified
-          ? `<span style="background: #dcfce7; color: #15803d; padding: 4px 12px; border-radius: 9999px; font-weight: 700; font-size: var(--text-xs);">✓ Verified ${me.user.role}</span>`
-          : `<span style="background: #fef3c7; color: #b45309; padding: 4px 12px; border-radius: 9999px; font-weight: 700; font-size: var(--text-xs);">⏳ Verification Pending</span>`;
+          ? `<span style="background: var(--color-success-bg); color: var(--color-success); border: 1.5px solid var(--color-border); padding: 4px 14px; border-radius: 9999px; font-weight: 700; font-size: var(--text-xs);">✓ Verified ${me.user.role}</span>`
+          : `<span style="background: var(--color-warning-bg); color: var(--color-warning); border: 1.5px solid var(--color-border); padding: 4px 14px; border-radius: 9999px; font-weight: 700; font-size: var(--text-xs);">⏳ Verification Pending</span>`;
 
         // Load counterpart lineage info
         try {
