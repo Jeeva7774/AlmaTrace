@@ -199,3 +199,5 @@ submitting changes. See `docs/adr/` for architectural decisions.
 
 Internal use — PSG College of Technology, Department of MCA.  
 Not for public distribution.
+
+Intentional Change Before React Migration
