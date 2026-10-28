@@ -284,10 +284,76 @@ const server = http.createServer(async (req, res) => {
       return res.end(JSON.stringify({ status: 'ok', app: 'ALMATRACE', env: 'preview', synthetic: true }));
     }
     if (pathname === '/api/v1/auth/session') {
+      const roleParam = url.searchParams.get('role');
+      if (roleParam === 'coordinator' || roleParam === 'admin') {
+        MOCK_STATE.user.role = 'coordinator';
+        MOCK_STATE.user.email = 'coordinator@psgtech.ac.in';
+        MOCK_STATE.profile.display_name = 'Dr. Coordinator';
+      }
       return res.end(JSON.stringify({ authenticated: true, user: MOCK_STATE.user }));
     }
     if (pathname === '/api/v1/auth/login') {
-      return res.end(JSON.stringify({ message: 'Signed in successfully.', user: MOCK_STATE.user }));
+      let body = '';
+      req.on('data', chunk => { body += chunk; });
+      req.on('end', () => {
+        try {
+          const { email = '' } = JSON.parse(body || '{}');
+          const lower = email.toLowerCase();
+          if (lower.includes('coordinator') || lower.includes('admin')) {
+            MOCK_STATE.user = {
+              id: '00000000-0000-0000-0001-000000000001',
+              email: 'coordinator@psgtech.ac.in',
+              role: 'coordinator',
+              status: 'active',
+            };
+            MOCK_STATE.profile = {
+              display_name: 'Dr. Coordinator',
+              headline: 'MCA Department Faculty Coordinator',
+              bio: 'Department administrator and mentorship program coordinator.',
+              current_role: 'Associate Professor & Coordinator',
+              current_company: 'PSG College of Technology',
+              time_zone: 'Asia/Kolkata',
+              visibility: 'discoverable',
+            };
+          } else if (lower.includes('alumni')) {
+            MOCK_STATE.user = {
+              id: 'user-alumni-1',
+              email: 'synth.alumni1@almatrace.local',
+              role: 'alumni',
+              status: 'active',
+            };
+            MOCK_STATE.profile = {
+              display_name: 'Meena Suresh',
+              headline: 'Senior Cloud Architect @ AWS • PSG MCA 2023',
+              bio: 'Cloud architecture and distributed systems guidance.',
+              current_role: 'Senior Cloud Architect',
+              current_company: 'Amazon Web Services',
+              time_zone: 'Asia/Kolkata',
+              visibility: 'discoverable',
+            };
+          } else {
+            MOCK_STATE.user = {
+              id: '00000000-0000-0000-0002-000000000001',
+              email: 'synth.student1@almatrace.local',
+              role: 'student',
+              status: 'active',
+            };
+            MOCK_STATE.profile = {
+              display_name: 'Arjun Dev',
+              headline: 'MCA Student (2024–2026 Batch)',
+              bio: 'Interested in distributed systems, compilers, and cloud engineering.',
+              current_role: 'Student',
+              current_company: 'PSG College of Technology',
+              time_zone: 'Asia/Kolkata',
+              visibility: 'discoverable',
+            };
+          }
+          res.end(JSON.stringify({ message: 'Signed in successfully.', user: MOCK_STATE.user }));
+        } catch {
+          res.end(JSON.stringify({ message: 'Signed in successfully.', user: MOCK_STATE.user }));
+        }
+      });
+      return;
     }
     if (pathname === '/api/v1/auth/logout') {
       return res.end(JSON.stringify({ message: 'Signed out.' }));
