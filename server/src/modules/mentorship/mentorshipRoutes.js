@@ -3,7 +3,6 @@
  */
 
 import { Router } from 'express';
-import { v4 as uuidv4 } from 'uuid';
 import { query, withTransaction } from '../../config/db.js';
 import { requireAuth, requireVerified } from '../../middleware/auth.js';
 import { createError } from '../../middleware/errorHandler.js';
@@ -394,7 +393,7 @@ router.post('/relationships/:id/meetings', async (req, res, next) => {
 // PATCH /api/v1/meetings/:id — confirm, reschedule, or cancel
 router.patch('/meetings/:id', async (req, res, next) => {
   try {
-    const { action, cancelReason, newScheduledAt } = req.body; // 'confirm' | 'cancel' | 'complete'
+    const { action, cancelReason, newScheduledAt: _newScheduledAt } = req.body; // 'confirm' | 'cancel' | 'complete'
     const meetingId = req.params.id;
 
     const mRes = await query(

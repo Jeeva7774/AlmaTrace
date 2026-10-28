@@ -3,7 +3,7 @@
  */
 
 import { Router } from 'express';
-import { query, withTransaction } from '../../config/db.js';
+import { query } from '../../config/db.js';
 import { requireAuth, requireRole } from '../../middleware/auth.js';
 import { createError } from '../../middleware/errorHandler.js';
 
@@ -117,7 +117,7 @@ router.post('/programs/:id/cohorts', requireAuth, requireRole('coordinator', 'sy
 // ── POST /api/v1/departments/imports/dry-run — CSV import dry-run preview ──
 router.post('/imports/dry-run', requireAuth, requireRole('coordinator', 'sysadmin'), async (req, res, next) => {
   try {
-    const { rows, cohortId, memberType } = req.body;
+    const { rows, cohortId: _cohortId, memberType: _memberType } = req.body;
 
     if (!Array.isArray(rows) || rows.length === 0) {
       throw createError(400, 'EMPTY_IMPORT', 'CSV rows must be provided as an array.');

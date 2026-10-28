@@ -63,7 +63,7 @@ function _markActiveLink() {
   });
 
   // Try exact pathname first, then basename
-  let matched = _findBestMatch(links, pathname);
+  const matched = _findBestMatch(links, pathname);
 
   if (matched) {
     matched.classList.add('active');

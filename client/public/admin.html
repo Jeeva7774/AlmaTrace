@@ -4,155 +4,235 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="ALMATRACE Department Coordinator Operations Dashboard" />
-  <title>Coordinator Dashboard — ALMATRACE</title>
+  <title>Coordinator Console — ALMATRACE</title>
   <link rel="stylesheet" href="/styles/main.css" />
+  <style>
+    .tab-bar { display:flex; gap:var(--space-1); border-bottom:2px solid var(--color-border); margin-bottom:var(--space-6); overflow-x:auto; }
+    .tab-btn {
+      padding: var(--space-2) var(--space-4); font-size:var(--text-sm); font-weight:600;
+      background:none; border:none; border-bottom:3px solid transparent;
+      cursor:pointer; color:var(--color-text-muted); white-space:nowrap;
+      transition: color .15s, border-color .15s;
+    }
+    .tab-btn:hover { color: var(--color-brand-secondary); }
+    .tab-btn.active { color:var(--color-brand-secondary); border-bottom-color:var(--color-brand-secondary); font-weight:700; }
+    .tab-btn:focus-visible { outline:3px solid var(--color-brand-secondary); outline-offset:2px; }
+  </style>
 </head>
-<body>
+<body class="app-shell-body">
   <a href="#main-content" class="skip-link">Skip to main content</a>
+  <div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
+  <button class="menu-toggle" id="menu-toggle" aria-label="Open navigation menu" aria-expanded="false" aria-controls="sidebar">
+    <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true" fill="currentColor"><rect y="3" width="20" height="2" rx="1"/><rect y="9" width="20" height="2" rx="1"/><rect y="15" width="20" height="2" rx="1"/></svg>
+  </button>
 
-  <header class="site-header" role="banner">
-    <div class="container">
-      <div class="site-header__brand">
-        <a href="/admin.html" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: var(--space-2);">
-          <span class="site-header__logo" aria-hidden="true">◈</span>
-          <span class="site-header__name">ALMATRACE</span>
-          <span style="background: var(--color-brand-accent); color: var(--color-text); font-size: var(--text-xs); font-weight: 700; padding: 2px 6px; border-radius: var(--radius-sm); margin-left: var(--space-2);">
-            Coordinator
-          </span>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="Main navigation">
+      <div class="sidebar__brand">
+        <a href="/dashboard.html" style="display:flex;align-items:center;gap:var(--space-2);text-decoration:none;color:inherit;">
+          <span class="sidebar__logo" aria-hidden="true">◈</span>
+          <div><div class="sidebar__name">ALMATRACE</div><div class="sidebar__dept">PSG MCA</div></div>
         </a>
       </div>
-      <nav class="site-header__nav" aria-label="Main navigation" style="display: flex; gap: var(--space-3); align-items: center;">
-        <a href="/admin.html" style="color: var(--color-brand-accent); font-weight: 700; text-decoration: none;">Admin Console</a>
-        <a href="/dashboard.html" style="color: var(--color-text-on-primary); text-decoration: none;">User View</a>
-        <button id="logout-btn" class="btn btn--outline" style="padding: var(--space-1) var(--space-3); font-size: var(--text-xs);">Logout</button>
+      <nav class="sidebar__nav" aria-label="Application navigation">
+        <div class="sidebar__section">
+          <span class="sidebar__section-label">Overview</span>
+          <a href="/dashboard.html" class="sidebar__link" data-roles="student,alumni,coordinator,sysadmin">
+            <svg class="sidebar__link-icon" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor"><path d="M1 6l7-5 7 5v9h-4V9H5v6H1V6z"/></svg>Dashboard
+          </a>
+        </div>
+        <div class="sidebar__section">
+          <span class="sidebar__section-label">Mentorship</span>
+          <a href="/lineage.html" class="sidebar__link" data-roles="student,alumni,coordinator,sysadmin">
+            <svg class="sidebar__link-icon" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a3 3 0 100 6A3 3 0 008 1zM2 14a6 6 0 0112 0H2z"/></svg>Token Lineage
+          </a>
+          <a href="/mentors.html" class="sidebar__link" data-roles="student,coordinator,sysadmin">
+            <svg class="sidebar__link-icon" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor"><circle cx="5" cy="5" r="3"/><circle cx="11" cy="5" r="3"/><path d="M0 14a5 5 0 0110 0H0zm6 0a5 5 0 0110 0H6z"/></svg>Find Mentors
+          </a>
+          <a href="/requests.html" class="sidebar__link" data-roles="student,alumni,coordinator,sysadmin">
+            <svg class="sidebar__link-icon" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="3" width="14" height="10" rx="1"/><path d="M1 7h14" stroke="currentColor" stroke-width="0.8" fill="none"/></svg>Requests &amp; Meetings
+          </a>
+        </div>
+        <div class="sidebar__section" id="admin-nav-section">
+          <span class="sidebar__section-label">Administration</span>
+          <a href="/admin.html" class="sidebar__link active" data-roles="coordinator,sysadmin" aria-current="page">
+            <svg class="sidebar__link-icon" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l1.5 3h3l-2.5 2 1 3L8 7l-3 2 1-3L3.5 4h3z"/></svg>Coordinator Console
+          </a>
+        </div>
       </nav>
-    </div>
-  </header>
-
-  <main id="main-content" class="container" style="padding-block: var(--space-8);">
-    <div style="margin-bottom: var(--space-6);">
-      <h1 style="font-size: var(--text-3xl); font-weight: 800; margin-bottom: var(--space-2);">Department Operations</h1>
-      <p style="color: var(--color-text-muted); font-size: var(--text-sm);">
-        Review verification requests, inspect aggregate program metrics, and monitor audit trails.
-      </p>
-    </div>
-
-    <!-- Navigation Tabs -->
-    <div style="display: flex; gap: var(--space-3); border-bottom: 2px solid var(--color-border); margin-bottom: var(--space-6); overflow-x: auto;">
-      <button id="tab-verify" class="btn btn--ghost tab-btn" style="border-bottom: 2px solid var(--color-brand-secondary); color: var(--color-brand-secondary); font-weight: 700; border-radius: 0;">
-        Verification Queue
-      </button>
-      <button id="tab-metrics" class="btn btn--ghost tab-btn" style="color: var(--color-text-muted); border-radius: 0;">
-        Operations Metrics
-      </button>
-      <button id="tab-audit" class="btn btn--ghost tab-btn" style="color: var(--color-text-muted); border-radius: 0;">
-        Audit Log
-      </button>
-      <button id="tab-reports" class="btn btn--ghost tab-btn" style="color: var(--color-text-muted); border-radius: 0;">
-        Safety Reports
-      </button>
-    </div>
-
-    <!-- 1. Verification Queue Panel -->
-    <section id="panel-verify">
-      <div id="verify-list" style="display: flex; flex-direction: column; gap: var(--space-4);">
-        <p style="color: var(--color-text-muted);">Loading verification queue...</p>
+      <div class="sidebar__user">
+        <div class="sidebar__user-avatar" id="sidebar-avatar" aria-hidden="true">C</div>
+        <div class="sidebar__user-info">
+          <span class="sidebar__user-name" id="sidebar-user-name">Coordinator</span>
+          <span class="sidebar__user-role" id="sidebar-user-role">Administrator</span>
+        </div>
+        <button class="sidebar__logout" id="sidebar-logout-btn" aria-label="Sign out" title="Sign out">
+          <svg aria-hidden="true" viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M10 2H6a2 2 0 00-2 2v2h2V4h4v8h-4v-2H4v2a2 2 0 002 2h4a2 2 0 002-2V4a2 2 0 00-2-2zm-4 9l-3-3 3-3v2h5v2H6v2z"/></svg>
+        </button>
       </div>
-    </section>
+    </aside>
 
-    <!-- 2. Operations Metrics Panel -->
-    <section id="panel-metrics" style="display: none;">
-      <div class="notice-card notice-card--info" style="margin-bottom: var(--space-6);">
-        <p style="font-size: var(--text-xs);">
-          🔒 <strong>Privacy Policy:</strong> Counts for groups with fewer than 5 members are automatically suppressed (masked as <code>&lt; 5</code>) to prevent deanonymization.
+    <div class="page-main">
+      <header class="page-header">
+        <div class="page-header__breadcrumb" aria-label="Breadcrumb">
+          <span style="color:var(--color-text-muted);font-size:var(--text-xs);">Administration</span>
+        </div>
+        <h1 class="page-header__title">Coordinator Operations</h1>
+        <div class="page-header__actions">
+          <button id="open-export-modal-btn" class="btn btn--primary" style="font-size:var(--text-xs);gap:var(--space-2);">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
+            Export to Excel
+          </button>
+        </div>
+      </header>
+
+      <main id="main-content" class="page-body">
+        <p style="color:var(--color-text-muted);font-size:var(--text-sm);margin-bottom:var(--space-6);">
+          Review department verification requests, inspect aggregate program metrics, monitor append-only audit trails, and export member records.
         </p>
-      </div>
-      <div id="metrics-content" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: var(--space-6);">
-        <p style="color: var(--color-text-muted);">Loading aggregate metrics...</p>
-      </div>
-    </section>
 
-    <!-- 3. Audit Log Panel -->
-    <section id="panel-audit" style="display: none;">
-      <div style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); overflow-x: auto;">
-        <table style="width: 100%; border-collapse: collapse; font-size: var(--text-sm); text-align: left;">
-          <thead>
-            <tr style="border-bottom: 1px solid var(--color-border); background: var(--color-surface-raised);">
-              <th style="padding: var(--space-3) var(--space-4);">Timestamp</th>
-              <th style="padding: var(--space-3) var(--space-4);">Action</th>
-              <th style="padding: var(--space-3) var(--space-4);">Actor</th>
-              <th style="padding: var(--space-3) var(--space-4);">Target</th>
-            </tr>
-          </thead>
-          <tbody id="audit-table-body">
-            <tr><td colspan="4" style="padding: var(--space-4); text-align: center; color: var(--color-text-muted);">Loading audit events...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
+        <!-- Navigation Tabs -->
+        <div class="tab-bar" role="tablist">
+          <button class="tab-btn active" id="tab-verify" role="tab" aria-selected="true" aria-controls="panel-verify">
+            Verification Queue
+          </button>
+          <button class="tab-btn" id="tab-metrics" role="tab" aria-selected="false" aria-controls="panel-metrics">
+            Operations Metrics
+          </button>
+          <button class="tab-btn" id="tab-audit" role="tab" aria-selected="false" aria-controls="panel-audit">
+            Audit Log
+          </button>
+          <button class="tab-btn" id="tab-reports" role="tab" aria-selected="false" aria-controls="panel-reports">
+            Safety Reports
+          </button>
+        </div>
 
-    <!-- 4. Safety Reports Panel -->
-    <section id="panel-reports" style="display: none;">
-      <div id="reports-list">
-        <p style="color: var(--color-text-muted);">Loading reports...</p>
-      </div>
-    </section>
-  </main>
+        <!-- 1. Verification Queue Panel -->
+        <section id="panel-verify" role="tabpanel" aria-labelledby="tab-verify">
+          <div id="verify-list" style="display:flex;flex-direction:column;gap:var(--space-4);">
+            <p style="color:var(--color-text-muted);">Loading verification queue…</p>
+          </div>
+        </section>
 
-  <footer class="site-footer" role="contentinfo">
-    <div class="container">
-      <p>ALMATRACE — Department of MCA, PSG College of Technology.</p>
+        <!-- 2. Operations Metrics Panel -->
+        <section id="panel-metrics" role="tabpanel" aria-labelledby="tab-metrics" style="display:none;">
+          <div class="notice-card notice-card--info" style="margin-bottom:var(--space-6);">
+            <p style="font-size:var(--text-xs);margin:0;">
+              🔒 <strong>Privacy Policy:</strong> Counts for groups with fewer than 5 members are automatically suppressed (masked as <code>&lt; 5</code>) to prevent deanonymization.
+            </p>
+          </div>
+          <div id="metrics-content" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:var(--space-6);">
+            <p style="color:var(--color-text-muted);">Loading aggregate metrics…</p>
+          </div>
+        </section>
+
+        <!-- 3. Audit Log Panel -->
+        <section id="panel-audit" role="tabpanel" aria-labelledby="tab-audit" style="display:none;">
+          <div style="background:var(--color-surface);border:1.5px solid var(--color-border);border-radius:var(--radius-lg);overflow-x:auto;">
+            <table style="width:100%;border-collapse:collapse;font-size:var(--text-sm);text-align:left;">
+              <thead>
+                <tr style="border-bottom:1.5px solid var(--color-border);background:var(--color-surface-raised);">
+                  <th style="padding:var(--space-3) var(--space-4);">Timestamp</th>
+                  <th style="padding:var(--space-3) var(--space-4);">Action</th>
+                  <th style="padding:var(--space-3) var(--space-4);">Actor</th>
+                  <th style="padding:var(--space-3) var(--space-4);">Target</th>
+                </tr>
+              </thead>
+              <tbody id="audit-table-body">
+                <tr><td colspan="4" style="padding:var(--space-4);text-align:center;color:var(--color-text-muted);">Loading audit events…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- 4. Safety Reports Panel -->
+        <section id="panel-reports" role="tabpanel" aria-labelledby="tab-reports" style="display:none;">
+          <div id="reports-list">
+            <p style="color:var(--color-text-muted);">Loading reports…</p>
+          </div>
+        </section>
+
+        <!-- Excel Export Modal -->
+        <div id="export-modal" style="display:none;position:fixed;inset:0;background:rgba(13,59,43,0.65);backdrop-filter:blur(2px);z-index:1000;align-items:center;justify-content:center;padding:var(--space-4);" role="dialog" aria-modal="true" aria-labelledby="export-modal-title">
+          <div style="background:var(--color-surface);width:100%;max-width:32rem;border-radius:var(--radius-lg);padding:var(--space-6);box-shadow:var(--shadow-md);border:2px solid var(--color-border);">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:var(--space-2);">
+              <h2 id="export-modal-title" style="font-size:var(--text-xl);font-weight:700;">Export Member Records</h2>
+              <span class="badge badge--forest">Administrator Only</span>
+            </div>
+            <p style="font-size:var(--text-sm);color:var(--color-text-muted);margin-bottom:var(--space-4);">
+              Generate an Excel-compatible spreadsheet (.xlsx) of verified student and alumni records. Passwords, session secrets, and private reports are strictly excluded.
+            </p>
+
+            <form id="export-form">
+              <div style="margin-bottom:var(--space-4);">
+                <label for="export-category" style="display:block;font-weight:600;font-size:var(--text-sm);margin-bottom:var(--space-1);">
+                  Member Category to Export
+                </label>
+                <select id="export-category" style="width:100%;padding:var(--space-3);border:1.5px solid var(--color-border);border-radius:var(--radius);font-size:var(--text-sm);background:#fff;">
+                  <option value="all">All Members (Students &amp; Alumni Worksheets)</option>
+                  <option value="students">Students Only</option>
+                  <option value="alumni">Alumni Mentors Only</option>
+                </select>
+              </div>
+
+              <!-- Included fields preview -->
+              <div style="background:var(--color-surface-raised);border:1px solid var(--color-border-light);border-radius:var(--radius);padding:var(--space-3);margin-bottom:var(--space-4);font-size:var(--text-xs);">
+                <strong style="color:var(--color-brand-primary);display:block;margin-bottom:4px;">Included Fields in Spreadsheet:</strong>
+                <p style="color:var(--color-text-muted);margin:0;line-height:1.4;">
+                  Display Name, Institutional Email, Token Sequence Key, Cohort &amp; Batch, Program, Department, Affiliation Status, Account Status, Registration Date, Profile Headline, Current Role &amp; Company, LinkedIn, Mentorship Availability &amp; Capacity, and Time Zone.
+                </p>
+                <div style="margin-top:6px;color:var(--color-warning);font-weight:600;">
+                  🛡️ Formula-injection sanitization applied to all text cells.
+                </div>
+              </div>
+
+              <div id="export-feedback" style="display:none;margin-bottom:var(--space-4);padding:var(--space-3);border-radius:var(--radius);font-size:var(--text-xs);"></div>
+
+              <div style="display:flex;justify-content:flex-end;gap:var(--space-3);">
+                <button type="button" id="export-cancel-btn" class="btn btn--ghost">Cancel</button>
+                <button type="submit" id="export-download-btn" class="btn btn--primary" style="gap:var(--space-2);">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
+                  Download .xlsx
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+      </main>
     </div>
-  </footer>
+  </div>
 
   <script type="module">
     import { ApiClient } from '/js/services/api.js';
-
+    import { initSidebar, renderSidebar } from '/js/sidebar.js';
     const api = new ApiClient('/api/v1');
 
-    document.getElementById('logout-btn').addEventListener('click', async () => {
-      try { await api.post('/auth/logout', {}); } catch {}
-      window.location.href = '/login.html';
-    });
+    // Tab Switching Logic
+    const tabs = {
+      verify:  { btn: document.getElementById('tab-verify'),  panel: document.getElementById('panel-verify'),  load: loadVerifications },
+      metrics: { btn: document.getElementById('tab-metrics'), panel: document.getElementById('panel-metrics'), load: loadMetrics },
+      audit:   { btn: document.getElementById('tab-audit'),   panel: document.getElementById('panel-audit'),   load: loadAudit },
+      reports: { btn: document.getElementById('tab-reports'), panel: document.getElementById('panel-reports'), load: loadReports },
+    };
 
-    // Check coordinator authorization
-    async function checkCoordinator() {
-      try {
-        const session = await api.get('/auth/session');
-        if (!session.authenticated || (session.user.role !== 'coordinator' && session.user.role !== 'sysadmin')) {
-          alert('Coordinator access required.');
-          window.location.href = '/dashboard.html';
-        }
-      } catch {
-        window.location.href = '/login.html';
-      }
-    }
-    checkCoordinator();
-
-    // Tab switching
-    const tabs = [
-      { btn: document.getElementById('tab-verify'), panel: document.getElementById('panel-verify'), load: loadVerifications },
-      { btn: document.getElementById('tab-metrics'), panel: document.getElementById('panel-metrics'), load: loadMetrics },
-      { btn: document.getElementById('tab-audit'), panel: document.getElementById('panel-audit'), load: loadAudit },
-      { btn: document.getElementById('tab-reports'), panel: document.getElementById('panel-reports'), load: loadReports },
-    ];
-
-    tabs.forEach(({ btn, panel, load }) => {
-      btn.addEventListener('click', () => {
-        tabs.forEach((t) => {
-          t.btn.style.borderBottom = 'none';
-          t.btn.style.color = 'var(--color-text-muted)';
-          t.btn.style.fontWeight = 'normal';
-          t.panel.style.display = 'none';
-        });
-        btn.style.borderBottom = '2px solid var(--color-brand-secondary)';
-        btn.style.color = 'var(--color-brand-secondary)';
-        btn.style.fontWeight = '700';
-        panel.style.display = 'block';
-        load();
+    function switchAdminTab(key) {
+      Object.values(tabs).forEach(t => {
+        t.btn.classList.remove('active');
+        t.btn.setAttribute('aria-selected', 'false');
+        t.panel.style.display = 'none';
       });
+      tabs[key].btn.classList.add('active');
+      tabs[key].btn.setAttribute('aria-selected', 'true');
+      tabs[key].panel.style.display = 'block';
+      tabs[key].load();
+    }
+
+    Object.entries(tabs).forEach(([k, t]) => {
+      t.btn.addEventListener('click', () => switchAdminTab(k));
     });
 
+    // Verification Queue
     async function loadVerifications() {
       const container = document.getElementById('verify-list');
       try {
@@ -160,40 +240,36 @@
         const list = res.verifications || [];
 
         if (list.length === 0) {
-          container.innerHTML = `<p style="padding: var(--space-8); text-align: center; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius); color: var(--color-text-muted);">Verification queue is clear! No pending submissions.</p>`;
+          container.innerHTML = `<div style="padding:var(--space-8);text-align:center;background:var(--color-surface);border:1.5px dashed var(--color-border);border-radius:var(--radius-lg);color:var(--color-text-muted);"><p style="margin:0;">Verification queue is clear! No pending submissions.</p></div>`;
           return;
         }
 
-        container.innerHTML = '';
-        for (const item of list) {
-          const card = document.createElement('article');
-          card.className = 'feature-card';
-          card.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-3); flex-wrap: wrap; gap: var(--space-2);">
+        container.innerHTML = list.map(item => `
+          <article class="feature-card">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:var(--space-3);flex-wrap:wrap;gap:var(--space-2);">
               <div>
-                <h2 style="font-size: var(--text-lg); font-weight: 700;">${item.display_name}</h2>
-                <div style="font-size: var(--text-sm); color: var(--color-text-muted);">
+                <h2 style="font-size:var(--text-base);font-weight:700;">${item.display_name}</h2>
+                <div style="font-size:var(--text-xs);color:var(--color-text-muted);">
                   ${item.email} • Role: <strong>${item.member_type.toUpperCase()}</strong> • Cohort: <strong>${item.cohort_label}</strong>
                 </div>
               </div>
-              <span style="font-size: var(--text-xs); background: var(--color-warning-bg); color: var(--color-warning); border: 1px solid var(--color-border); padding: 3px 10px; border-radius: 9999px; font-weight: 700;">
+              <span class="badge badge--terracotta">
                 ${item.affiliation_status.toUpperCase()}
               </span>
             </div>
 
-            <div style="background: var(--color-surface-raised); padding: var(--space-3); border-radius: var(--radius); margin-bottom: var(--space-4); font-size: var(--text-sm);">
+            <div style="background:var(--color-surface-raised);padding:var(--space-3);border-radius:var(--radius);margin-bottom:var(--space-4);font-size:var(--text-xs);">
               <strong>Submitted Identifier / Token:</strong> <code>${item.raw_identifier}</code> (Normalized: <code>${item.normalized_token_key}</code>)
             </div>
 
-            <div style="display: flex; gap: var(--space-2); justify-content: flex-end;">
-              <button class="btn btn--ghost reject-btn" data-id="${item.id}" style="font-size: var(--text-xs); color: var(--color-error);">Reject</button>
-              <button class="btn btn--primary approve-btn" data-id="${item.id}" style="font-size: var(--text-xs);">Approve & Verify</button>
+            <div style="display:flex;gap:var(--space-2);justify-content:flex-end;">
+              <button class="btn btn--ghost reject-btn" data-id="${item.id}" style="font-size:var(--text-xs);color:var(--color-error);border:1px solid var(--color-error);">Reject</button>
+              <button class="btn btn--primary approve-btn" data-id="${item.id}" style="font-size:var(--text-xs);">Approve &amp; Verify</button>
             </div>
-          `;
-          container.appendChild(card);
-        }
+          </article>
+        `).join('');
 
-        document.querySelectorAll('.approve-btn').forEach((btn) => {
+        container.querySelectorAll('.approve-btn').forEach(btn => {
           btn.addEventListener('click', async () => {
             btn.disabled = true;
             try {
@@ -206,7 +282,7 @@
           });
         });
 
-        document.querySelectorAll('.reject-btn').forEach((btn) => {
+        container.querySelectorAll('.reject-btn').forEach(btn => {
           btn.addEventListener('click', async () => {
             if (!confirm('Reject this affiliation?')) return;
             btn.disabled = true;
@@ -220,35 +296,37 @@
           });
         });
       } catch (err) {
-        container.innerHTML = `<p style="color: var(--color-error);">Failed to load verification queue.</p>`;
+        container.innerHTML = `<p style="color:var(--color-error);">Failed to load verification queue.</p>`;
       }
     }
 
+    // Operations Metrics
     async function loadMetrics() {
       const container = document.getElementById('metrics-content');
       try {
         const res = await api.get('/admin/metrics');
         container.innerHTML = `
           <div class="feature-card">
-            <h2 style="font-size: var(--text-base); font-weight: 700; margin-bottom: var(--space-3);">Active Accounts</h2>
-            ${(res.users || []).map((u) => `<div style="display: flex; justify-content: space-between; padding-block: var(--space-1); border-bottom: 1px solid var(--color-border);"><span>${u.role} (${u.status})</span><strong style="font-family: var(--font-mono);">${u.count}</strong></div>`).join('')}
+            <h2 style="font-size:var(--text-sm);font-weight:700;margin-bottom:var(--space-3);">Active Accounts</h2>
+            ${(res.users || []).map(u => `<div style="display:flex;justify-content:space-between;padding-block:var(--space-1);border-bottom:1px solid var(--color-border);font-size:var(--text-xs);"><span>${u.role} (${u.status})</span><strong style="font-family:var(--font-mono);">${u.count}</strong></div>`).join('')}
           </div>
 
           <div class="feature-card">
-            <h2 style="font-size: var(--text-base); font-weight: 700; margin-bottom: var(--space-3);">Mentorship Relationships</h2>
-            ${(res.mentorships || []).map((m) => `<div style="display: flex; justify-content: space-between; padding-block: var(--space-1); border-bottom: 1px solid var(--color-border);"><span>Status: ${m.status}</span><strong style="font-family: var(--font-mono);">${m.count}</strong></div>`).join('')}
+            <h2 style="font-size:var(--text-sm);font-weight:700;margin-bottom:var(--space-3);">Mentorship Relationships</h2>
+            ${(res.mentorships || []).map(m => `<div style="display:flex;justify-content:space-between;padding-block:var(--space-1);border-bottom:1px solid var(--color-border);font-size:var(--text-xs);"><span>Status: ${m.status}</span><strong style="font-family:var(--font-mono);">${m.count}</strong></div>`).join('')}
           </div>
 
           <div class="feature-card">
-            <h2 style="font-size: var(--text-base); font-weight: 700; margin-bottom: var(--space-3);">Request Activity</h2>
-            ${(res.requests || []).map((r) => `<div style="display: flex; justify-content: space-between; padding-block: var(--space-1); border-bottom: 1px solid var(--color-border);"><span>${r.status}</span><strong style="font-family: var(--font-mono);">${r.count}</strong></div>`).join('')}
+            <h2 style="font-size:var(--text-sm);font-weight:700;margin-bottom:var(--space-3);">Request Activity</h2>
+            ${(res.requests || []).map(r => `<div style="display:flex;justify-content:space-between;padding-block:var(--space-1);border-bottom:1px solid var(--color-border);font-size:var(--text-xs);"><span>${r.status}</span><strong style="font-family:var(--font-mono);">${r.count}</strong></div>`).join('')}
           </div>
         `;
       } catch (err) {
-        container.innerHTML = `<p style="color: var(--color-error);">Failed to load operational metrics.</p>`;
+        container.innerHTML = `<p style="color:var(--color-error);">Failed to load operational metrics.</p>`;
       }
     }
 
+    // Audit Log
     async function loadAudit() {
       const tbody = document.getElementById('audit-table-body');
       try {
@@ -256,23 +334,24 @@
         const events = res.auditEvents || [];
 
         if (events.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="4" style="padding: var(--space-4); text-align: center; color: var(--color-text-muted);">No audit events recorded yet.</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="4" style="padding:var(--space-4);text-align:center;color:var(--color-text-muted);">No audit events recorded yet.</td></tr>`;
           return;
         }
 
-        tbody.innerHTML = events.map((ev) => `
-          <tr style="border-bottom: 1px solid var(--color-border);">
-            <td style="padding: var(--space-2) var(--space-4); font-size: var(--text-xs); color: var(--color-text-muted);">${new Date(ev.created_at).toLocaleString()}</td>
-            <td style="padding: var(--space-2) var(--space-4); font-weight: 700; font-family: var(--font-mono); font-size: var(--text-xs);">${ev.action}</td>
-            <td style="padding: var(--space-2) var(--space-4);">${ev.actor_email || 'System'}</td>
-            <td style="padding: var(--space-2) var(--space-4); font-size: var(--text-xs);">${ev.target_type || '-'} (${ev.target_id || '-'})</td>
+        tbody.innerHTML = events.map(ev => `
+          <tr style="border-bottom:1px solid var(--color-border);">
+            <td style="padding:var(--space-2) var(--space-4);font-size:var(--text-xs);color:var(--color-text-muted);">${new Date(ev.created_at).toLocaleString()}</td>
+            <td style="padding:var(--space-2) var(--space-4);font-weight:700;font-family:var(--font-mono);font-size:var(--text-xs);">${ev.action}</td>
+            <td style="padding:var(--space-2) var(--space-4);font-size:var(--text-xs);">${ev.actor_email || 'System'}</td>
+            <td style="padding:var(--space-2) var(--space-4);font-size:var(--text-xs);">${ev.target_type || '-'} (${ev.target_id || '-'})</td>
           </tr>
         `).join('');
       } catch (err) {
-        tbody.innerHTML = `<tr><td colspan="4" style="padding: var(--space-4); text-align: center; color: var(--color-error);">Failed to load audit logs.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="4" style="padding:var(--space-4);text-align:center;color:var(--color-error);">Failed to load audit logs.</td></tr>`;
       }
     }
 
+    // Safety Reports
     async function loadReports() {
       const container = document.getElementById('reports-list');
       try {
@@ -280,27 +359,138 @@
         const reports = res.reports || [];
 
         if (reports.length === 0) {
-          container.innerHTML = `<p style="padding: var(--space-8); text-align: center; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius); color: var(--color-text-muted);">No safety reports submitted.</p>`;
+          container.innerHTML = `<div style="padding:var(--space-8);text-align:center;background:var(--color-surface);border:1.5px dashed var(--color-border);border-radius:var(--radius-lg);color:var(--color-text-muted);"><p style="margin:0;">No safety reports submitted.</p></div>`;
           return;
         }
 
-        container.innerHTML = reports.map((r) => `
-          <article class="feature-card" style="margin-bottom: var(--space-4);">
-            <div style="display: flex; justify-content: space-between; margin-bottom: var(--space-2);">
+        container.innerHTML = reports.map(r => `
+          <article class="feature-card" style="margin-bottom:var(--space-4);">
+            <div style="display:flex;justify-content:space-between;margin-bottom:var(--space-2);">
               <strong>Category: ${r.category}</strong>
-              <span style="font-size: var(--text-xs); background: #fef2f2; color: var(--color-error); padding: 2px 8px; border-radius: 9999px;">${r.status}</span>
+              <span class="badge badge--error">${r.status}</span>
             </div>
-            <div style="font-size: var(--text-sm); color: var(--color-text-muted);">
+            <div style="font-size:var(--text-xs);color:var(--color-text-muted);">
               Reported User: ${r.reported_email} • Submitted: ${new Date(r.created_at).toLocaleDateString()}
             </div>
           </article>
         `).join('');
       } catch (err) {
-        container.innerHTML = `<p style="color: var(--color-error);">Failed to load reports.</p>`;
+        container.innerHTML = `<p style="color:var(--color-error);">Failed to load reports.</p>`;
       }
     }
 
-    loadVerifications();
+    // Excel Export Modal Controls
+    const exportModal = document.getElementById('export-modal');
+    const openExportModalBtn = document.getElementById('open-export-modal-btn');
+    const exportCancelBtn = document.getElementById('export-cancel-btn');
+    const exportForm = document.getElementById('export-form');
+    const exportFeedback = document.getElementById('export-feedback');
+    const exportDownloadBtn = document.getElementById('export-download-btn');
+
+    openExportModalBtn.addEventListener('click', () => {
+      exportFeedback.style.display = 'none';
+      exportDownloadBtn.disabled = false;
+      exportDownloadBtn.innerHTML = `
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
+        Download .xlsx
+      `;
+      exportModal.style.display = 'flex';
+    });
+
+    exportCancelBtn.addEventListener('click', () => {
+      exportModal.style.display = 'none';
+    });
+
+    exportForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const category = document.getElementById('export-category').value;
+      exportDownloadBtn.disabled = true;
+      exportDownloadBtn.textContent = 'Generating spreadsheet…';
+      exportFeedback.style.display = 'none';
+
+      try {
+        // Direct browser file download via window.location / fetch blob
+        const downloadUrl = `/api/v1/admin/export/members?category=${encodeURIComponent(category)}`;
+        const response = await fetch(downloadUrl, {
+          method: 'GET',
+          credentials: 'same-origin',
+        });
+
+        if (!response.ok) {
+          const errData = await response.json().catch(() => ({}));
+          throw new Error(errData.message || `Export failed with status ${response.status}`);
+        }
+
+        const blob = await response.blob();
+        const dateStr = new Date().toISOString().slice(0, 10);
+        const filename = `almatrace-members-${category}-${dateStr}.xlsx`;
+
+        // Trigger browser file download
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+
+        exportFeedback.className = 'notice-card notice-card--info';
+        exportFeedback.style.background = 'var(--color-success-bg)';
+        exportFeedback.style.borderColor = 'var(--color-success)';
+        exportFeedback.style.color = 'var(--color-success)';
+        exportFeedback.textContent = `✓ Spreadsheet downloaded successfully (${filename}).`;
+        exportFeedback.style.display = 'block';
+
+        setTimeout(() => {
+          exportModal.style.display = 'none';
+        }, 1800);
+      } catch (err) {
+        exportFeedback.className = 'notice-card';
+        exportFeedback.style.background = 'var(--color-error-bg)';
+        exportFeedback.style.borderColor = 'var(--color-error)';
+        exportFeedback.style.color = 'var(--color-error)';
+        exportFeedback.textContent = `Failed to generate export: ${err.message}`;
+        exportFeedback.style.display = 'block';
+      } finally {
+        exportDownloadBtn.disabled = false;
+        exportDownloadBtn.innerHTML = `
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
+          Download .xlsx
+        `;
+      }
+    });
+
+    // Boot & Authorization Check
+    async function boot() {
+      try {
+        const session = await api.get('/auth/session');
+        if (!session.authenticated) {
+          window.location.href = '/login.html';
+          return;
+        }
+
+        if (session.user.role !== 'coordinator' && session.user.role !== 'sysadmin') {
+          alert('Coordinator access required.');
+          window.location.href = '/dashboard.html';
+          return;
+        }
+
+        const me = await api.get('/me');
+        initSidebar(me.user.role);
+        renderSidebar({
+          displayName: me.profile?.display_name || 'Coordinator',
+          email: me.user.email,
+          role: me.user.role,
+        });
+
+        loadVerifications();
+      } catch {
+        window.location.href = '/login.html';
+      }
+    }
+
+    boot();
   </script>
 </body>
 </html>

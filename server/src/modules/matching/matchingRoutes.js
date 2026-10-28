@@ -6,7 +6,6 @@ import { Router } from 'express';
 import { query } from '../../config/db.js';
 import { requireAuth, requireVerified } from '../../middleware/auth.js';
 import { createError } from '../../middleware/errorHandler.js';
-import { explainTokenRelationship } from './tokenRuleEngine.js';
 
 const router = Router();
 

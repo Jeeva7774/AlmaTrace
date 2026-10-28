@@ -11,6 +11,7 @@ import http from 'http';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import ExcelJS from 'exceljs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -271,7 +272,7 @@ const MOCK_STATE = {
   ],
 };
 
-const server = http.createServer((req, res) => {
+const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
   const pathname = url.pathname;
 
@@ -412,14 +413,79 @@ const server = http.createServer((req, res) => {
       return res.end(JSON.stringify({ reports: [] }));
     }
     if (pathname === '/api/v1/admin/export/members') {
-      return res.end(JSON.stringify({ message: 'Export available in full-stack mode only. Returning mock response.', recordCount: 70, category: url.searchParams.get("category") || "all" }));
+      const category = (url.searchParams.get('category') || 'all').toLowerCase();
+      const workbook = new ExcelJS.Workbook();
+      workbook.creator = 'ALMATRACE Coordinator';
+      workbook.created = new Date();
+
+      const HEADER_FILL = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0D3B2B' } };
+      const HEADER_FONT = { bold: true, color: { argb: 'FFFFFFFF' } };
+
+      if (category === 'all' || category === 'students') {
+        const sheet = workbook.addWorksheet('Students');
+        sheet.columns = [
+          { header: 'Member Display Name', key: 'display_name', width: 28 },
+          { header: 'Email (admin-only ⚠)', key: 'email', width: 32 },
+          { header: 'Token Key', key: 'normalized_token_key', width: 14 },
+          { header: 'Cohort Label', key: 'cohort_label', width: 22 },
+          { header: 'Program Name', key: 'program_name', width: 32 },
+          { header: 'Department Name', key: 'department_name', width: 26 },
+          { header: 'Affiliation Status', key: 'affiliation_status', width: 18 },
+          { header: 'Account Status', key: 'account_status', width: 16 },
+        ];
+        sheet.getRow(1).fill = HEADER_FILL;
+        sheet.getRow(1).font = HEADER_FONT;
+        sheet.addRow({
+          display_name: 'Arjun Dev',
+          email: 'synth.student1@almatrace.local',
+          normalized_token_key: 'S24001',
+          cohort_label: '2024–2026 MCA',
+          program_name: 'Master of Computer Applications',
+          department_name: 'Department of MCA',
+          affiliation_status: 'verified',
+          account_status: 'active',
+        });
+      }
+
+      if (category === 'all' || category === 'alumni') {
+        const sheet = workbook.addWorksheet('Alumni');
+        sheet.columns = [
+          { header: 'Member Display Name', key: 'display_name', width: 28 },
+          { header: 'Email (admin-only ⚠)', key: 'email', width: 32 },
+          { header: 'Token Key', key: 'normalized_token_key', width: 14 },
+          { header: 'Cohort Label', key: 'cohort_label', width: 22 },
+          { header: 'Current Role', key: 'current_role', width: 28 },
+          { header: 'Current Company', key: 'current_company', width: 28 },
+          { header: 'Mentor Available', key: 'mentor_available', width: 16 },
+          { header: 'Max Mentees', key: 'max_mentees', width: 14 },
+        ];
+        sheet.getRow(1).fill = HEADER_FILL;
+        sheet.getRow(1).font = HEADER_FONT;
+        sheet.addRow({
+          display_name: 'Meena Suresh',
+          email: 'synth.alumni1@almatrace.local',
+          normalized_token_key: 'A21001',
+          cohort_label: '2021–2023 MCA',
+          current_role: 'Senior Cloud Architect',
+          current_company: 'Amazon Web Services',
+          mentor_available: 'Yes',
+          max_mentees: 3,
+        });
+      }
+
+      const dateStr = new Date().toISOString().slice(0, 10);
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', `attachment; filename="almatrace-members-${category}-${dateStr}.xlsx"`);
+      res.setHeader('X-Content-Type-Options', 'nosniff');
+      await workbook.xlsx.write(res);
+      return res.end();
     }
 
     return res.end(JSON.stringify({ status: 'mock_ok' }));
   }
 
   // ── Static Files Router ───────────────────────────────────────────────────
-  let filePath = path.join(PUBLIC_DIR, pathname === '/' ? 'index.html' : pathname);
+  const filePath = path.join(PUBLIC_DIR, pathname === '/' ? 'index.html' : pathname);
 
   fs.stat(filePath, (err, stats) => {
     if (err || !stats.isFile()) {

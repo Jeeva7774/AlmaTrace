@@ -32,7 +32,7 @@ router.get('/health', (_req, res) => {
   });
 });
 
-router.get('/health/ready', async (req, res, next) => {
+router.get('/health/ready', async (req, res, _next) => {
   try {
     const db = await checkDbHealth();
 

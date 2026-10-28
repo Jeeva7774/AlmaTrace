@@ -5,9 +5,7 @@
 import { hashPassword, verifyPassword } from '../src/modules/auth/passwords.js';
 import {
   registerSchema,
-  loginSchema,
   mentorSettingsSchema,
-  updateProfileSchema,
 } from '../../shared/schemas/authSchemas.js';
 
 describe('passwords.js', () => {

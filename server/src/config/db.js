@@ -23,8 +23,8 @@ export const pool = new Pool({
   statement_timeout: config.DB_STATEMENT_TIMEOUT_MS,
   // Idle connections released after 30 s to avoid resource leaks
   idleTimeoutMillis: 30000,
-  // Fail fast if a connection cannot be established within 10 s
-  connectionTimeoutMillis: 10000,
+  // Fail fast if a connection cannot be established within 10 s (1 s in test environment)
+  connectionTimeoutMillis: config.NODE_ENV === 'test' ? 1000 : 10000,
 });
 
 // Log slow queries — parameters intentionally omitted to avoid logging PII
