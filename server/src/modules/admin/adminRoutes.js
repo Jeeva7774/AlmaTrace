@@ -2,14 +2,26 @@
  * adminRoutes.js — coordinator and administrative controls
  *
  * Implements verification queue, audit views, reports moderation,
- * and privacy-preserving aggregate metrics.
+ * privacy-preserving aggregate metrics, and Excel member export.
  */
 
 import { Router } from 'express';
+import { rateLimit } from 'express-rate-limit';
+import ExcelJS from 'exceljs';
 import { query, withTransaction } from '../../config/db.js';
 import { requireAuth, requireRole } from '../../middleware/auth.js';
 import { createError } from '../../middleware/errorHandler.js';
 import { logAuditEvent } from '../audit/auditService.js';
+
+// ── Formula-injection sanitizer ───────────────────────────────────────────────
+// Prefixes any cell value that starts with =, +, -, or @ with a single quote
+// so spreadsheet applications do not evaluate it as a formula.
+const FORMULA_START = /^[=+\-@]/;
+function sanitizeCell(v) {
+  if (v === null || v === undefined) return '';
+  const str = String(v);
+  return FORMULA_START.test(str) ? `'${str}` : str;
+}
 
 const router = Router();
 
@@ -202,6 +214,226 @@ router.get('/reports', async (_req, res, next) => {
        ORDER BY r.created_at DESC`
     );
     res.json({ reports: result.rows });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ── Rate limiter for the export endpoint (5 requests / 5 min per IP) ─────────
+const exportRateLimit = rateLimit({
+  windowMs: 5 * 60 * 1000, // 5 minutes
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'TOO_MANY_REQUESTS', message: 'Export rate limit exceeded. Try again in 5 minutes.' },
+});
+
+// ── GET /api/v1/admin/export/members — Excel member export ───────────────────
+router.get('/export/members', exportRateLimit, async (req, res, next) => {
+  try {
+    const ALLOWED_CATEGORIES = new Set(['all', 'students', 'alumni']);
+    const category = (req.query.category || 'all').toLowerCase();
+
+    if (!ALLOWED_CATEGORIES.has(category)) {
+      throw createError(
+        400,
+        'INVALID_CATEGORY',
+        "Query parameter 'category' must be 'students', 'alumni', or 'all'."
+      );
+    }
+
+    // Resolve member_type filter value (DB stores 'student'/'alumni' singular)
+    const memberTypeFilter = category === 'students' ? 'student'
+                           : category === 'alumni'   ? 'alumni'
+                           : null; // null → 'all'
+
+    // Build parameterized query
+    const baseSql = `
+      SELECT
+        p.display_name,
+        u.email,
+        m.normalized_token_key,
+        c.label AS cohort_label,
+        prog.name AS program_name,
+        d.name AS department_name,
+        m.member_type,
+        m.affiliation_status,
+        u.status AS account_status,
+        u.created_at AS registered_at,
+        p.headline,
+        p.current_role,
+        p.current_company,
+        p.linkedin_url,
+        p.time_zone,
+        ms.available AS mentor_available,
+        ms.accepting_requests,
+        ms.max_mentees
+      FROM memberships m
+      JOIN users u ON u.id = m.user_id
+      JOIN profiles p ON p.user_id = u.id
+      JOIN cohorts c ON c.id = m.cohort_id
+      JOIN programs prog ON prog.id = c.program_id
+      JOIN departments d ON d.id = prog.department_id
+      LEFT JOIN mentor_settings ms ON ms.user_id = u.id
+      WHERE u.deleted_at IS NULL
+        AND m.is_primary = TRUE
+    `;
+
+    let sql, params;
+    if (memberTypeFilter === null) {
+      sql = baseSql + ` ORDER BY m.member_type, p.display_name`;
+      params = [];
+    } else {
+      sql = baseSql + ` AND m.member_type = $1 ORDER BY m.member_type, p.display_name`;
+      params = [memberTypeFilter];
+    }
+
+    const result = await query(sql, params);
+    const rows = result.rows;
+    const recordCount = rows.length;
+
+    // ── Build workbook ────────────────────────────────────────────────────────
+    const workbook = new ExcelJS.Workbook();
+    workbook.creator = 'ALMATRACE Admin';
+    workbook.created = new Date();
+
+    // Shared header style
+    const HEADER_FILL = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0D3B2B' } };
+    const HEADER_FONT = { bold: true, color: { argb: 'FFFFFFFF' } };
+
+    // ── Students sheet ────────────────────────────────────────────────────────
+    const studentSheet = workbook.addWorksheet('Students');
+    studentSheet.columns = [
+      { header: 'Member Display Name',       key: 'display_name',        width: 28 },
+      { header: 'Email (admin-only ⚠)',      key: 'email',               width: 32 },
+      { header: 'Token Key',                 key: 'normalized_token_key', width: 14 },
+      { header: 'Cohort Label',              key: 'cohort_label',         width: 22 },
+      { header: 'Program Name',              key: 'program_name',         width: 34 },
+      { header: 'Department Name',           key: 'department_name',      width: 28 },
+      { header: 'Affiliation Status',        key: 'affiliation_status',   width: 18 },
+      { header: 'Account Status',            key: 'account_status',       width: 16 },
+      { header: 'Registered At',             key: 'registered_at',        width: 22 },
+      { header: 'Profile Headline',          key: 'headline',             width: 40 },
+      { header: 'Time Zone',                 key: 'time_zone',            width: 20 },
+    ];
+    studentSheet.getRow(1).fill = HEADER_FILL;
+    studentSheet.getRow(1).font = HEADER_FONT;
+
+    // ── Alumni sheet ──────────────────────────────────────────────────────────
+    const alumniSheet = workbook.addWorksheet('Alumni');
+    alumniSheet.columns = [
+      { header: 'Member Display Name',       key: 'display_name',        width: 28 },
+      { header: 'Email (admin-only ⚠)',      key: 'email',               width: 32 },
+      { header: 'Token Key',                 key: 'normalized_token_key', width: 14 },
+      { header: 'Cohort Label',              key: 'cohort_label',         width: 22 },
+      { header: 'Program Name',              key: 'program_name',         width: 34 },
+      { header: 'Department Name',           key: 'department_name',      width: 28 },
+      { header: 'Affiliation Status',        key: 'affiliation_status',   width: 18 },
+      { header: 'Account Status',            key: 'account_status',       width: 16 },
+      { header: 'Registered At',             key: 'registered_at',        width: 22 },
+      { header: 'Profile Headline',          key: 'headline',             width: 40 },
+      { header: 'Current Role',              key: 'current_role',         width: 28 },
+      { header: 'Current Company',           key: 'current_company',      width: 28 },
+      { header: 'LinkedIn URL',              key: 'linkedin_url',         width: 36 },
+      { header: 'Mentor Available',          key: 'mentor_available',     width: 16 },
+      { header: 'Accepting Requests',        key: 'accepting_requests',   width: 18 },
+      { header: 'Max Mentees',               key: 'max_mentees',          width: 13 },
+      { header: 'Time Zone',                 key: 'time_zone',            width: 20 },
+    ];
+    alumniSheet.getRow(1).fill = HEADER_FILL;
+    alumniSheet.getRow(1).font = HEADER_FONT;
+
+    // ── Populate rows ─────────────────────────────────────────────────────────
+    let studentCount = 0;
+    let alumniCount  = 0;
+
+    for (const row of rows) {
+      const isStudent = row.member_type === 'student';
+      const registeredAt = row.registered_at
+        ? new Date(row.registered_at).toISOString().replace('T', ' ').slice(0, 19)
+        : '';
+
+      if (isStudent) {
+        studentCount++;
+        studentSheet.addRow({
+          display_name:         sanitizeCell(row.display_name),
+          email:                sanitizeCell(row.email),
+          normalized_token_key: sanitizeCell(row.normalized_token_key),
+          cohort_label:         sanitizeCell(row.cohort_label),
+          program_name:         sanitizeCell(row.program_name),
+          department_name:      sanitizeCell(row.department_name),
+          affiliation_status:   sanitizeCell(row.affiliation_status),
+          account_status:       sanitizeCell(row.account_status),
+          registered_at:        registeredAt,
+          headline:             sanitizeCell(row.headline),
+          time_zone:            sanitizeCell(row.time_zone),
+        });
+      } else {
+        alumniCount++;
+        alumniSheet.addRow({
+          display_name:         sanitizeCell(row.display_name),
+          email:                sanitizeCell(row.email),
+          normalized_token_key: sanitizeCell(row.normalized_token_key),
+          cohort_label:         sanitizeCell(row.cohort_label),
+          program_name:         sanitizeCell(row.program_name),
+          department_name:      sanitizeCell(row.department_name),
+          affiliation_status:   sanitizeCell(row.affiliation_status),
+          account_status:       sanitizeCell(row.account_status),
+          registered_at:        registeredAt,
+          headline:             sanitizeCell(row.headline),
+          current_role:         sanitizeCell(row.current_role),
+          current_company:      sanitizeCell(row.current_company),
+          linkedin_url:         sanitizeCell(row.linkedin_url),
+          mentor_available:     row.mentor_available === true  ? 'Yes'
+                              : row.mentor_available === false ? 'No' : '',
+          accepting_requests:   row.accepting_requests === true  ? 'Yes'
+                              : row.accepting_requests === false ? 'No' : '',
+          max_mentees:          row.max_mentees ?? '',
+          time_zone:            sanitizeCell(row.time_zone),
+        });
+      }
+    }
+
+    // ── Empty-result note rows ────────────────────────────────────────────────
+    if (studentCount === 0 && (category === 'students' || category === 'all')) {
+      studentSheet.addRow({ display_name: 'No records found for the selected category.' });
+    }
+    if (alumniCount === 0 && (category === 'alumni' || category === 'all')) {
+      alumniSheet.addRow({ display_name: 'No records found for the selected category.' });
+    }
+
+    // ── Audit log (no row data logged) ────────────────────────────────────────
+    const exportedFields = category === 'alumni'
+      ? ['display_name', 'email', 'normalized_token_key', 'cohort_label', 'program_name',
+         'department_name', 'affiliation_status', 'account_status', 'registered_at',
+         'headline', 'current_role', 'current_company', 'linkedin_url',
+         'mentor_available', 'accepting_requests', 'max_mentees', 'time_zone']
+      : category === 'students'
+      ? ['display_name', 'email', 'normalized_token_key', 'cohort_label', 'program_name',
+         'department_name', 'affiliation_status', 'account_status', 'registered_at',
+         'headline', 'time_zone']
+      : ['display_name', 'email', 'normalized_token_key', 'cohort_label', 'program_name',
+         'department_name', 'member_type', 'affiliation_status', 'account_status',
+         'registered_at', 'headline', 'current_role', 'current_company', 'linkedin_url',
+         'mentor_available', 'accepting_requests', 'max_mentees', 'time_zone'];
+
+    await logAuditEvent({
+      actorId:    req.user.id,
+      action:     'ADMIN_EXPORT_MEMBERS',
+      targetType: 'export',
+      targetId:   null,
+      requestId:  req.requestId,
+      metadata:   { category, recordCount, fields: exportedFields },
+    });
+
+    // ── Write response ────────────────────────────────────────────────────────
+    const dateStr = new Date().toISOString().slice(0, 10);
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="almatrace-members-${dateStr}.xlsx"`);
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+
+    await workbook.xlsx.write(res);
+    res.end();
   } catch (err) {
     next(err);
   }

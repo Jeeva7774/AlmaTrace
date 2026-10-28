@@ -4,154 +4,150 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="ALMATRACE — Digital Department Token System for PSG MCA alumni mentorship." />
-  <title>ALMATRACE — PSG MCA Token System</title>
+  <title>ALMATRACE — PSG MCA Department Token System</title>
   <link rel="stylesheet" href="/styles/main.css" />
+  <style>
+    /* Public landing page — no sidebar */
+    body { display: block; }
+    .landing-header {
+      background: var(--color-brand-primary);
+      color: var(--color-text-on-primary);
+      border-bottom: 3px solid var(--color-brand-accent);
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: var(--shadow-md);
+    }
+    .landing-header .container {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-block: var(--space-3);
+    }
+    .landing-brand { display: flex; align-items: center; gap: var(--space-2); }
+    .landing-logo { font-size: var(--text-2xl); color: var(--color-brand-secondary); }
+    .landing-name { font-size: var(--text-lg); font-weight: 800; letter-spacing: 0.06em; }
+    .landing-dept { font-size: var(--text-xs); color: var(--color-brand-accent); }
+    @media (max-width: 480px) { .landing-dept { display: none; } }
+    .landing-nav { display: flex; gap: var(--space-3); align-items: center; }
+    .landing-nav a { color: var(--color-text-on-primary); font-size: var(--text-sm); text-decoration: none; font-weight: 500; }
+    .landing-nav a:hover { color: var(--color-brand-accent); }
+  </style>
 </head>
 <body>
-  <!-- Skip navigation for keyboard and screen reader accessibility -->
   <a href="#main-content" class="skip-link">Skip to main content</a>
 
-  <header class="site-header" role="banner">
+  <header class="landing-header" role="banner">
     <div class="container">
-      <div class="site-header__brand">
-        <span class="site-header__logo" aria-hidden="true">◈</span>
-        <span class="site-header__name">ALMATRACE</span>
-        <span class="site-header__dept">PSG MCA Department</span>
+      <div class="landing-brand">
+        <span class="landing-logo" aria-hidden="true">◈</span>
+        <span class="landing-name">ALMATRACE</span>
+        <span class="landing-dept">PSG MCA Department</span>
       </div>
-      <nav class="site-header__nav" aria-label="Main navigation" style="display: flex; gap: var(--space-3); align-items: center;">
-        <a href="#how-it-works" style="color: var(--color-text-on-primary);">How It Works</a>
-        <a href="#tradition" style="color: var(--color-text-on-primary);">The Tradition</a>
-        <a href="/login.html" class="btn btn--outline" style="padding: var(--space-1) var(--space-3); font-size: var(--text-xs);">Sign In</a>
+      <nav class="landing-nav" aria-label="Main navigation">
+        <a href="#how-it-works">How It Works</a>
+        <a href="#tradition">The Tradition</a>
+        <a href="/login.html" class="btn btn--outline" style="padding: 0.4rem 1rem; font-size: var(--text-xs);">Sign In</a>
+        <a href="/register.html" class="btn btn--primary" style="padding: 0.4rem 1rem; font-size: var(--text-xs);">Join</a>
       </nav>
     </div>
   </header>
 
   <main id="main-content">
-    
-    <!-- Synthetic preview banner -->
-    <div class="env-banner" role="status" aria-live="polite">
-      🛡️ <strong>Department of Computer Applications</strong> — ALMATRACE Digital Token System for MCA students & verified alumni.
-    </div>
 
     <!-- Hero Section -->
     <section class="hero" aria-labelledby="hero-heading">
-      <div class="container">
+      <div class="container" style="max-width: 56rem; text-align: center;">
+        <div style="display: inline-flex; align-items: center; gap: var(--space-2); background: rgba(255,255,255,0.12); border: 1px solid rgba(142,176,155,0.4); border-radius: 9999px; padding: 4px 14px; font-size: var(--text-xs); font-weight: 600; color: var(--color-brand-accent); margin-bottom: var(--space-6);">
+          Department of MCA &nbsp;·&nbsp; PSG College of Technology
+        </div>
         <h1 id="hero-heading" class="hero__heading">
-          Your Token. Your Lineage. Your Mentor.
+          Your Token. Your Lineage.<br>Your Mentor.
         </h1>
         <p class="hero__subheading">
-          ALMATRACE connects MCA students with their token counterparts across
-          graduating batches — fostering continuity, shared departmental identity,
-          and career mentorship.
+          ALMATRACE connects MCA students with their token counterparts across graduating batches — fostering continuity, shared departmental identity, and structured career mentorship.
         </p>
         <div class="hero__actions">
-          <a href="/register.html" class="btn btn--primary">Join the Programme →</a>
-          <a href="#how-it-works" class="btn btn--ghost">Explore the Roadmap</a>
+          <a href="/register.html" class="btn btn--primary" style="padding: 0.75rem 2rem; font-size: var(--text-base);">Join the Programme →</a>
+          <a href="#how-it-works" class="btn btn--ghost" style="padding: 0.75rem 2rem; font-size: var(--text-base);">How it works</a>
         </div>
       </div>
     </section>
 
     <!-- The Tradition Section -->
-    <section id="tradition" style="padding: var(--space-12) 0; background: var(--color-surface); border-bottom: 1.5px solid var(--color-border);">
+    <section id="tradition" style="padding: var(--space-16) 0; background: var(--color-surface); border-bottom: 1.5px solid var(--color-border);">
       <div class="container" style="max-width: 52rem; text-align: center;">
-        <span class="badge badge--forest" style="margin-bottom: var(--space-3);">THE PSG MCA TRADITION</span>
+        <span class="badge badge--forest" style="margin-bottom: var(--space-4); display: inline-block;">THE PSG MCA TRADITION</span>
         <h2 style="font-size: var(--text-2xl); font-weight: 800; margin-bottom: var(--space-4);">
           Bridging Generations Through Roll-Number Lineage
         </h2>
-        <p style="font-size: var(--text-base); color: var(--color-text-muted); line-height: var(--leading-relaxed); margin-bottom: var(--space-4);">
-          In the Department of MCA at PSG College of Technology, each student’s roll number carries a legacy. 
-          The sequence number links students to seniors who walked the exact same path years before. 
-          ALMATRACE honors this historical heritage by enabling verified token connections and structured guidance.
+        <p style="font-size: var(--text-base); color: var(--color-text-muted); line-height: var(--leading-relaxed); max-width: 40rem; margin-inline: auto; margin-bottom: var(--space-8);">
+          In the Department of MCA at PSG College of Technology, each student's roll number carries a legacy. The sequence number links students to seniors who walked the exact same path years before. ALMATRACE honors this heritage by enabling verified token connections and structured guidance.
         </p>
-        <div style="display: flex; justify-content: center; gap: var(--space-4); flex-wrap: wrap; margin-top: var(--space-6);">
-          <div style="background: var(--color-surface-raised); border: 1.5px solid var(--color-border); border-radius: var(--radius); padding: var(--space-4); min-width: 200px;">
+        <div style="display: flex; justify-content: center; gap: var(--space-6); flex-wrap: wrap;">
+          <div style="background: var(--color-surface-raised); border: 1.5px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-6); min-width: 160px;">
             <div style="font-size: var(--text-2xl); font-weight: 800; color: var(--color-brand-primary);">100%</div>
-            <div style="font-size: var(--text-xs); color: var(--color-text-muted); font-weight: 600;">Mutual Consent Model</div>
+            <div style="font-size: var(--text-xs); color: var(--color-text-muted); font-weight: 600; margin-top: 4px;">Mutual Consent Model</div>
           </div>
-          <div style="background: var(--color-surface-raised); border: 1.5px solid var(--color-border); border-radius: var(--radius); padding: var(--space-4); min-width: 200px;">
+          <div style="background: var(--color-surface-raised); border: 1.5px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-6); min-width: 160px;">
             <div style="font-size: var(--text-2xl); font-weight: 800; color: var(--color-brand-secondary);">Zero</div>
-            <div style="font-size: var(--text-xs); color: var(--color-text-muted); font-weight: 600;">Public Email Exposure</div>
+            <div style="font-size: var(--text-xs); color: var(--color-text-muted); font-weight: 600; margin-top: 4px;">Public Email Exposure</div>
           </div>
-          <div style="background: var(--color-surface-raised); border: 1.5px solid var(--color-border); border-radius: var(--radius); padding: var(--space-4); min-width: 200px;">
-            <div style="font-size: var(--text-2xl); font-weight: 800; color: var(--color-brand-primary);">Coordinator</div>
-            <div style="font-size: var(--text-xs); color: var(--color-text-muted); font-weight: 600;">Verified Affiliation</div>
+          <div style="background: var(--color-surface-raised); border: 1.5px solid var(--color-border); border-radius: var(--radius-lg); padding: var(--space-6); min-width: 160px;">
+            <div style="font-size: var(--text-2xl); font-weight: 800; color: var(--color-brand-primary);">Verified</div>
+            <div style="font-size: var(--text-xs); color: var(--color-text-muted); font-weight: 600; margin-top: 4px;">Alumni Identities</div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- How ALMATRACE Works: 4-Step Visual Roadmap -->
+    <!-- How It Works: 4-Step Roadmap -->
     <section id="how-it-works" class="features" aria-labelledby="features-heading">
       <div class="container">
-        <h2 id="features-heading" style="margin-bottom: var(--space-2);">How ALMATRACE Works</h2>
-        <p style="text-align: center; color: var(--color-text-muted); font-size: var(--text-sm); max-width: 40rem; margin-inline: auto; margin-bottom: var(--space-8);">
+        <h2 id="features-heading" style="text-align: center; margin-bottom: var(--space-2);">How ALMATRACE Works</h2>
+        <p style="text-align: center; color: var(--color-text-muted); font-size: var(--text-sm); max-width: 38rem; margin-inline: auto; margin-bottom: var(--space-8);">
           A disciplined, privacy-safe journey from registration to 1:1 guidance sessions.
         </p>
-
         <div class="features__grid" role="list">
-
           <article class="feature-card" role="listitem">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-2);">
-              <span class="feature-card__icon" aria-hidden="true" style="margin: 0;">1</span>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-3);">
+              <span class="feature-card__icon" aria-hidden="true" style="margin: 0; background: var(--color-brand-secondary); color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: var(--text-base);">1</span>
               <span class="badge badge--sage">Verification</span>
             </div>
             <h3 class="feature-card__title">Institutional Registration</h3>
-            <p class="feature-card__desc">
-              Sign up with your college email. Alumni identities are verified by the MCA department coordinator before appearing in mentorship discovery.
-            </p>
+            <p class="feature-card__desc">Sign up with your college email. Alumni identities are verified by the MCA department coordinator before appearing in mentorship discovery.</p>
           </article>
-
           <article class="feature-card" role="listitem">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-2);">
-              <span class="feature-card__icon" aria-hidden="true" style="margin: 0;">2</span>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-3);">
+              <span class="feature-card__icon" aria-hidden="true" style="margin: 0; background: var(--color-brand-secondary); color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: var(--text-base);">2</span>
               <span class="badge badge--sage">Lineage</span>
             </div>
             <h3 class="feature-card__title">Token Lineage Discovery</h3>
-            <p class="feature-card__desc">
-              View your batch lineage sequence. If your primary counterpart is unavailable or at capacity, ALMATRACE suggests verified alumni based on shared topics.
-            </p>
+            <p class="feature-card__desc">View your batch lineage sequence. If your primary counterpart is unavailable, ALMATRACE suggests verified alumni based on shared topics — always with a clear explanation.</p>
           </article>
-
           <article class="feature-card" role="listitem">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-2);">
-              <span class="feature-card__icon" aria-hidden="true" style="margin: 0;">3</span>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-3);">
+              <span class="feature-card__icon" aria-hidden="true" style="margin: 0; background: var(--color-brand-secondary); color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: var(--text-base);">3</span>
               <span class="badge badge--sage">Consent</span>
             </div>
             <h3 class="feature-card__title">Structured Request Lifecycle</h3>
-            <p class="feature-card__desc">
-              A token match is not consent to mentorship. Active relationships require mutual agreement with clear objectives and meeting expectations.
-            </p>
+            <p class="feature-card__desc">A token match is not consent to mentorship. Active relationships require mutual agreement through an explicit request with clear objectives.</p>
           </article>
-
           <article class="feature-card" role="listitem">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-2);">
-              <span class="feature-card__icon" aria-hidden="true" style="margin: 0;">4</span>
-              <span class="badge badge--sage">Mentorship</span>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-3);">
+              <span class="feature-card__icon" aria-hidden="true" style="margin: 0; background: var(--color-brand-secondary); color: white; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: var(--text-base);">4</span>
+              <span class="badge badge--sage">Sessions</span>
             </div>
             <h3 class="feature-card__title">Scheduled Guidance Sessions</h3>
-            <p class="feature-card__desc">
-              Agreed pairs arrange structured sessions with meeting agendas and video links (Google Meet or campus meetings) with local IST scheduling.
-            </p>
+            <p class="feature-card__desc">Agreed pairs arrange structured sessions with meeting agendas and video links (Google Meet or campus meetings) with local IST scheduling.</p>
           </article>
-
         </div>
       </div>
     </section>
 
-    <!-- Important Notice Section -->
+    <!-- Notice Section -->
     <section class="notice-section" aria-labelledby="notice-heading">
-      <div class="container">
+      <div class="container" style="max-width: 52rem;">
         <div class="notice-card notice-card--info">
-          <h2 id="notice-heading" class="notice-card__title">
-            Departmental Code & Privacy Guarantee
-          </h2>
-          <p>
-            ALMATRACE is an internal departmental platform for current MCA students and alumni of PSG College of Technology.
-          </p>
-          <p>
-            We strictly protect community privacy: personal email addresses and exact roll numbers are never published or shared. 
-            Mentors maintain full control over their capacity limits and availability.
-          </p>
+          <h2 id="notice-heading" class="notice-card__title">Departmental Code &amp; Privacy Guarantee</h2>
+          <p>ALMATRACE is an internal departmental platform for current MCA students and alumni of PSG College of Technology.</p>
+          <p>We strictly protect community privacy: personal email addresses and exact roll numbers are never published or shared. Mentors maintain full control over their capacity limits and availability.</p>
         </div>
       </div>
     </section>
@@ -160,10 +156,7 @@
 
   <footer class="site-footer" role="contentinfo">
     <div class="container">
-      <p>
-        ALMATRACE — Department of MCA, PSG College of Technology.
-        For inquiries or verification support, contact your department coordinator.
-      </p>
+      <p>ALMATRACE — Department of MCA, PSG College of Technology. For support, contact your department coordinator.</p>
       <nav class="site-footer__links" aria-label="Footer links">
         <a href="/privacy.html">Privacy Notice</a>
         <a href="/conduct.html">Code of Conduct</a>

@@ -411,6 +411,9 @@ const server = http.createServer((req, res) => {
     if (pathname === '/api/v1/admin/reports') {
       return res.end(JSON.stringify({ reports: [] }));
     }
+    if (pathname === '/api/v1/admin/export/members') {
+      return res.end(JSON.stringify({ message: 'Export available in full-stack mode only. Returning mock response.', recordCount: 70, category: url.searchParams.get("category") || "all" }));
+    }
 
     return res.end(JSON.stringify({ status: 'mock_ok' }));
   }

@@ -6,132 +6,150 @@
   <meta name="description" content="Sign in to ALMATRACE — PSG MCA Department Token System." />
   <title>Sign In — ALMATRACE</title>
   <link rel="stylesheet" href="/styles/main.css" />
+  <style>
+    body { display: flex; flex-direction: column; min-height: 100vh; }
+    .auth-header {
+      background: var(--color-brand-primary);
+      border-bottom: 3px solid var(--color-brand-accent);
+    }
+    .auth-header .container {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-block: var(--space-3);
+    }
+    .auth-brand { display: flex; align-items: center; gap: var(--space-2); color: var(--color-text-on-primary); text-decoration: none; }
+    .auth-logo { font-size: var(--text-2xl); color: var(--color-brand-secondary); }
+    .auth-name { font-size: var(--text-lg); font-weight: 800; letter-spacing: 0.06em; }
+    .auth-main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-12) var(--space-4);
+      background: var(--color-bg);
+    }
+    .auth-card {
+      width: 100%;
+      max-width: 26rem;
+      background: var(--color-surface);
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      box-shadow: var(--shadow-md);
+    }
+    .auth-card h1 { font-size: var(--text-2xl); font-weight: 800; margin-bottom: var(--space-1); }
+    .auth-card .subtitle { color: var(--color-text-muted); font-size: var(--text-sm); margin-bottom: var(--space-6); }
+    .form-group { margin-bottom: var(--space-4); }
+    .form-label { display: block; font-weight: 600; font-size: var(--text-sm); margin-bottom: var(--space-1); }
+    .form-input {
+      width: 100%; padding: var(--space-3);
+      border: 1.5px solid var(--color-border); border-radius: var(--radius);
+      font-size: var(--text-sm); font-family: inherit;
+      background: #fff; color: var(--color-text);
+    }
+    .form-input:focus { outline: none; border-color: var(--color-brand-secondary); box-shadow: 0 0 0 3px rgba(217,116,75,0.18); }
+    .required-star { color: var(--color-error); margin-left: 2px; }
+    .label-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-1); }
+  </style>
 </head>
 <body>
   <a href="#main-content" class="skip-link">Skip to main content</a>
 
-  <header class="site-header" role="banner">
+  <header class="auth-header" role="banner">
     <div class="container">
-      <div class="site-header__brand">
-        <a href="/" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: var(--space-2);">
-          <span class="site-header__logo" aria-hidden="true">◈</span>
-          <span class="site-header__name">ALMATRACE</span>
-        </a>
-      </div>
-      <nav class="site-header__nav" aria-label="Main navigation">
-        <a href="/register.html" class="btn btn--outline">Register</a>
-      </nav>
+      <a href="/" class="auth-brand">
+        <span class="auth-logo" aria-hidden="true">◈</span>
+        <span class="auth-name">ALMATRACE</span>
+      </a>
+      <a href="/register.html" class="btn btn--outline" style="padding: 0.4rem 1rem; font-size: var(--text-xs);">Register</a>
     </div>
   </header>
 
-  <main id="main-content" class="container" style="max-width: 32rem; padding-block: var(--space-12);">
-    <div class="env-banner" role="status" aria-live="polite" style="margin-bottom: var(--space-6); border-radius: var(--radius);">
-      ⚠️ <strong>Development Environment</strong> — use synthetic credentials (e.g. <code>synth.student1@almatrace.local</code> / <code>[SYNTHETIC]Dev@12345</code>).
-    </div>
+  <main id="main-content" class="auth-main">
+    <div class="auth-card">
+      <div style="text-align: center; margin-bottom: var(--space-6);">
+        <span style="font-size: 2.5rem; display: block; margin-bottom: var(--space-2);" aria-hidden="true">◈</span>
+        <h1>Sign In</h1>
+        <p class="subtitle">Enter your institutional email and password to access your mentorship workspace.</p>
+      </div>
 
-    <div class="feature-card" style="padding: var(--space-8);">
-      <h1 style="font-size: var(--text-2xl); font-weight: 800; margin-bottom: var(--space-2);">Sign In</h1>
-      <p style="color: var(--color-text-muted); font-size: var(--text-sm); margin-bottom: var(--space-6);">
-        Enter your institutional email and password to access your token lineage and mentorship workspace.
-      </p>
+      <div id="env-banner" class="env-banner" role="status" style="margin-bottom: var(--space-5); display: none;">
+        <strong>Preview Mode</strong> — use synthetic credentials.
+      </div>
 
-      <div id="error-summary" class="notice-card" style="display: none; background: var(--color-error-bg); border: 1.5px solid var(--color-error); margin-bottom: var(--space-6); padding: var(--space-4);" role="alert" aria-live="assertive">
-        <p id="error-message" style="color: var(--color-error); font-weight: 700; font-size: var(--text-sm);"></p>
+      <div id="error-summary" style="display: none; background: var(--color-error-bg); border: 1.5px solid var(--color-error); border-radius: var(--radius); padding: var(--space-3) var(--space-4); margin-bottom: var(--space-4);" role="alert" aria-live="assertive">
+        <p id="error-message" style="color: var(--color-error); font-weight: 600; font-size: var(--text-sm); margin: 0;"></p>
       </div>
 
       <form id="login-form" novalidate>
-        <div style="margin-bottom: var(--space-4);">
-          <label for="email" style="display: block; font-weight: 600; font-size: var(--text-sm); margin-bottom: var(--space-1);">
-            Institutional Email Address <span aria-hidden="true" style="color: var(--color-error);">*</span>
+        <div class="form-group">
+          <label for="email" class="form-label">
+            Institutional Email <span class="required-star" aria-hidden="true">*</span>
           </label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            required
-            autocomplete="email"
-            placeholder="e.g. rollnumber@psgtech.ac.in"
-            style="width: 100%; padding: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius); font-size: var(--text-base);"
-          />
+          <input type="email" id="email" name="email" required autocomplete="email"
+            placeholder="e.g. rollnumber@psgtech.ac.in" class="form-input" />
         </div>
 
-        <div style="margin-bottom: var(--space-6);">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-1);">
-            <label for="password" style="font-weight: 600; font-size: var(--text-sm);">
-              Password <span aria-hidden="true" style="color: var(--color-error);">*</span>
+        <div class="form-group">
+          <div class="label-row">
+            <label for="password" class="form-label" style="margin: 0;">
+              Password <span class="required-star" aria-hidden="true">*</span>
             </label>
             <a href="/forgot-password.html" style="font-size: var(--text-xs);">Forgot password?</a>
           </div>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            required
-            autocomplete="current-password"
-            style="width: 100%; padding: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius); font-size: var(--text-base);"
-          />
+          <input type="password" id="password" name="password" required autocomplete="current-password"
+            class="form-input" />
         </div>
 
-        <button type="submit" id="submit-btn" class="btn btn--primary" style="width: 100%; padding-block: var(--space-3);">
+        <button type="submit" id="submit-btn" class="btn btn--primary" style="width: 100%; padding-block: var(--space-3); margin-top: var(--space-2);">
           Sign In
         </button>
       </form>
 
-      <div style="margin-top: var(--space-6); text-align: center; font-size: var(--text-sm); color: var(--color-text-muted);">
-        Don't have an account yet? <a href="/register.html" style="font-weight: 600;">Register here</a>.
-      </div>
+      <p style="text-align: center; font-size: var(--text-sm); color: var(--color-text-muted); margin-top: var(--space-6);">
+        Don't have an account? <a href="/register.html" style="font-weight: 700;">Register here</a>
+      </p>
     </div>
   </main>
 
-  <footer class="site-footer" role="contentinfo">
-    <div class="container">
-      <p>ALMATRACE — Department of MCA, PSG College of Technology.</p>
-    </div>
+  <footer class="site-footer" role="contentinfo" style="text-align: center; padding: var(--space-4); font-size: var(--text-xs);">
+    <p>ALMATRACE — Department of MCA, PSG College of Technology.</p>
   </footer>
 
   <script type="module">
     import { ApiClient } from '/js/services/api.js';
-
     const api = new ApiClient('/api/v1');
     const form = document.getElementById('login-form');
     const errorSummary = document.getElementById('error-summary');
     const errorMessage = document.getElementById('error-message');
     const submitBtn = document.getElementById('submit-btn');
 
-    // Check if user already logged in
-    try {
-      const session = await api.get('/auth/session');
-      if (session.authenticated) {
-        window.location.href = session.user.role === 'coordinator' ? '/admin.html' : '/dashboard.html';
-      }
-    } catch {}
+    // Show dev banner in preview mode
+    fetch('/api/v1/health').then(r => r.json()).then(d => {
+      if (d.env === 'preview') document.getElementById('env-banner').style.display = 'block';
+    }).catch(() => {});
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       errorSummary.style.display = 'none';
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Signing in…';
 
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
 
-      if (!email || !password) {
-        errorMessage.textContent = 'Please enter both email and password.';
-        errorSummary.style.display = 'block';
-        return;
-      }
-
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Signing in...';
-
       try {
         const res = await api.post('/auth/login', { email, password });
-        if (res.user.role === 'coordinator') {
+        // Redirect based on role
+        const role = res.user?.role;
+        if (role === 'coordinator' || role === 'sysadmin') {
           window.location.href = '/admin.html';
         } else {
           window.location.href = '/dashboard.html';
         }
       } catch (err) {
-        errorMessage.textContent = err.message || 'Invalid email or password.';
+        errorMessage.textContent = err.message || 'Invalid email or password. Please try again.';
         errorSummary.style.display = 'block';
+        errorSummary.focus();
         submitBtn.disabled = false;
         submitBtn.textContent = 'Sign In';
       }
